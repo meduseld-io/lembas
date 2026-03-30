@@ -13,7 +13,6 @@ export default function EditModal({ item, onSave, onClose, onDelete }) {
     nameRef.current?.select();
   }, []);
 
-  // Close on Escape
   useEffect(() => {
     function handleKey(e) {
       if (e.key === 'Escape') onClose();
@@ -37,10 +36,6 @@ export default function EditModal({ item, onSave, onClose, onDelete }) {
   return (
     <div className="modal-overlay" onClick={onClose} role="dialog" aria-modal="true" aria-label="Edit item">
       <div className="modal-content" onClick={e => e.stopPropagation()}>
-        <div className="modal-header">
-          <h3>Edit Item</h3>
-          <button className="modal-close" onClick={onClose} aria-label="Close">✕</button>
-        </div>
         <form onSubmit={handleSave}>
           <div className="field">
             <label htmlFor="edit-name">Name</label>
@@ -53,36 +48,38 @@ export default function EditModal({ item, onSave, onClose, onDelete }) {
               required
             />
           </div>
-          <div className="field">
-            <label htmlFor="edit-qty">Quantity</label>
-            <input
-              id="edit-qty"
-              type="number"
-              min="1"
-              value={qty}
-              onChange={e => setQty(parseInt(e.target.value) || 1)}
-            />
-          </div>
-          <div className="field">
-            <label htmlFor="edit-price">Last Price</label>
-            <input
-              id="edit-price"
-              type="text"
-              inputMode="decimal"
-              value={price}
-              onChange={e => setPrice(e.target.value)}
-              placeholder="e.g. 3.49"
-            />
-          </div>
-          <div className="field">
-            <label htmlFor="edit-aisle">Aisle / Location</label>
-            <input
-              id="edit-aisle"
-              type="text"
-              value={aisle}
-              onChange={e => setAisle(e.target.value)}
-              placeholder="e.g. Aisle 5, Dairy section"
-            />
+          <div className="field-row">
+            <div className="field field-sm">
+              <label htmlFor="edit-qty">Qty</label>
+              <input
+                id="edit-qty"
+                type="number"
+                min="1"
+                value={qty}
+                onChange={e => setQty(parseInt(e.target.value) || 1)}
+              />
+            </div>
+            <div className="field field-sm">
+              <label htmlFor="edit-price">Price</label>
+              <input
+                id="edit-price"
+                type="text"
+                inputMode="decimal"
+                value={price}
+                onChange={e => setPrice(e.target.value)}
+                placeholder="3.49"
+              />
+            </div>
+            <div className="field field-grow">
+              <label htmlFor="edit-aisle">Aisle / Location</label>
+              <input
+                id="edit-aisle"
+                type="text"
+                value={aisle}
+                onChange={e => setAisle(e.target.value)}
+                placeholder="Dairy"
+              />
+            </div>
           </div>
           <div className="modal-actions">
             <button type="button" className="btn-delete" onClick={onDelete}>Delete</button>
