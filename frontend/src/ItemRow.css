@@ -1,29 +1,3 @@
-.item-swipe-wrapper {
-  position: relative;
-  margin-bottom: 8px;
-  border-radius: var(--radius);
-  overflow: hidden;
-}
-
-.item-delete-bg {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  width: 100px;
-  background: var(--red-500);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-weight: 600;
-  font-size: 0.85rem;
-  border-radius: var(--radius);
-  opacity: 0.6;
-  transition: opacity 0.15s;
-}
-.item-delete-bg.revealed { opacity: 1; }
-
 .item {
   display: flex;
   align-items: center;
@@ -33,12 +7,12 @@
   border-radius: var(--radius);
   box-shadow: var(--shadow-sm);
   border: 1px solid var(--gray-100);
+  margin-bottom: 8px;
   transition: opacity 0.25s, box-shadow 0.15s;
-  position: relative;
-  z-index: 1;
   cursor: pointer;
   user-select: none;
   -webkit-user-select: none;
+  touch-action: manipulation;
 }
 .item:hover { box-shadow: var(--shadow-md); }
 .item.checked { opacity: 0.45; }
@@ -46,20 +20,10 @@
   text-decoration: line-through;
   color: var(--gray-400);
 }
-
-.drag-handle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: none;
-  border: none;
-  color: var(--gray-300);
-  cursor: grab;
-  padding: 4px 2px;
-  touch-action: none;
-  flex-shrink: 0;
+.item.dragging {
+  box-shadow: var(--shadow-lg);
+  border-color: var(--green-500);
 }
-.drag-handle:active { cursor: grabbing; color: var(--gray-500); }
 
 .item input[type='checkbox'] {
   width: 20px;
@@ -86,7 +50,6 @@
   color: var(--gray-400);
   display: flex;
   align-items: center;
-  gap: 0;
 }
 .meta-price { color: var(--green-600); font-weight: 500; }
 .meta-aisle { color: var(--gray-500); }
@@ -142,3 +105,31 @@
 .item-btn:active { transform: scale(0.9); }
 .item-btn.star-btn { color: var(--gray-300); }
 .item-btn.star-btn.starred { color: var(--gold-400); }
+
+/* Delete drop zone */
+.delete-zone {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20px;
+  padding-bottom: calc(20px + env(safe-area-inset-bottom, 0));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--red-500);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.9rem;
+  z-index: 200;
+  animation: slideUpZone 0.2s ease;
+  transition: background 0.15s;
+}
+.delete-zone.over {
+  background: #a71d2a;
+}
+@keyframes slideUpZone {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}

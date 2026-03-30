@@ -1,16 +1,26 @@
 import { useState, useRef, useMemo } from 'react';
-import { DndContext, closestCenter, PointerSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { DndContext, closestCenter, PointerSensor, TouchSensor, useSensor, useSensors, useDroppable, DragOverlay } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import ItemRow from './ItemRow.jsx';
 import EditModal from './EditModal.jsx';
 import './ShoppingList.css';
 
+function DeleteZone() {
+  const { isOver, setNodeRef } = useDroppable({ id: 'delete-zone' });
+  return (
+    <div ref={setNodeRef} className={`delete-zone ${isOver ? 'over' : ''}`}>
+      🗑️ Drop here to delete
+    </div>
+  );
+}
+
 export default function ShoppingList({ items, setItems, addItem, regulars, toggleRegular, isRegular }) {
   const [inputVal, setInputVal] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [highlightIdx, setHighlightIdx] = useState(-1);
   const [editingItem, setEditingItem] = useState(null);
+  const [isDragging, setIsDragging] = useState(false);
   const inputRef = useRef(null);
 
   const unchecked = useMemo(() => items.filter(i => !i.checked), [items]);
@@ -26,7 +36,7 @@ export default function ShoppingList({ items, setItems, addItem, regulars, toggl
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 5 } })
+    useSensor(TouchSensor, { activationConstraint: { delay: 300, tolerance: 8 } })
   );
 
   function handleAdd() {
@@ -67,14 +77,31 @@ export default function ShoppingList({ items, setItems, addItem, regulars, toggl
     setShowSuggestions(e.target.value.trim().length > 0);
   }
 
+  function handleDragStart() {
+    setIsDragging(true);
+  }
+
   function handleDragEnd(event) {
+    setIsDragging(false);
     const { active, over } = event;
-    if (!over || active.id === over.id) return;
-    setItems(prev => {
-      const oldIndex = prev.findIndex(i => i.id === active.id);
-      const newIndex = prev.findIndex(i => i.id === over.id);
-      return arrayMove(prev, oldIndex, newIndex);
-    });
+    if (!over) return;
+
+    if (over.id === 'delete-zone') {
+      setItems(prev => prev.filter(i => i.id !== active.id));
+      return;
+    }
+
+    if (active.id !== over.id) {
+      setItems(prev => {
+        const oldIndex = prev.findIndex(i => i.id === active.id);
+        const newIndex = prev.findIndex(i => i.id === over.id);
+        return arrayMove(prev, oldIndex, newIndex);
+      });
+    }
+  }
+
+  function handleDragCancel() {
+    setIsDragging(false);
   }
 
   function handleCheck(id) {
@@ -146,28 +173,26 @@ export default function ShoppingList({ items, setItems, addItem, regulars, toggl
           <p>Your list is empty.<br />Add items above or pick from your regulars.</p>
         </div>
       ) : (
-        <>
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
-            modifiers={[restrictToVerticalAxis]}
-          >
-            <SortableContext items={unchecked.map(i => i.id)} strategy={verticalListSortingStrategy}>
-              {unchecked.map(item => (
-                <ItemRow
-                  key={item.id}
-                  item={item}
-                  onCheck={handleCheck}
-                  onDelete={handleDelete}
-                  onQty={handleQty}
-                  onStar={() => toggleRegular(item.name)}
-                  starred={isRegular(item.name)}
-                  onTap={() => setEditingItem(item)}
-                />
-              ))}
-            </SortableContext>
-          </DndContext>
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+          onDragCancel={handleDragCancel}
+        >
+          <SortableContext items={unchecked.map(i => i.id)} strategy={verticalListSortingStrategy}>
+            {unchecked.map(item => (
+              <ItemRow
+                key={item.id}
+                item={item}
+                onCheck={handleCheck}
+                onQty={handleQty}
+                onStar={() => toggleRegular(item.name)}
+                starred={isRegular(item.name)}
+                onTap={() => setEditingItem(item)}
+              />
+            ))}
+          </SortableContext>
 
           {checked.length > 0 && (
             <>
@@ -177,7 +202,6 @@ export default function ShoppingList({ items, setItems, addItem, regulars, toggl
                   key={item.id}
                   item={item}
                   onCheck={handleCheck}
-                  onDelete={handleDelete}
                   onQty={handleQty}
                   onStar={() => toggleRegular(item.name)}
                   starred={isRegular(item.name)}
@@ -187,7 +211,9 @@ export default function ShoppingList({ items, setItems, addItem, regulars, toggl
               ))}
             </>
           )}
-        </>
+
+          {isDragging && <DeleteZone />}
+        </DndContext>
       )}
 
       {editingItem && (
