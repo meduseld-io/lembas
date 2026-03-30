@@ -3,7 +3,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import './ItemRow.css';
 
-const SWIPE_THRESHOLD = 80;
+const SWIPE_THRESHOLD = 160;
 
 export default function ItemRow({ item, onCheck, onDelete, onQty, onStar, starred, onTap, sortable = true }) {
   const [swipeX, setSwipeX] = useState(0);
