@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import './EditModal.css';
 
 export default function EditModal({ item, onSave, onClose, onDelete }) {
@@ -6,12 +6,6 @@ export default function EditModal({ item, onSave, onClose, onDelete }) {
   const [qty, setQty] = useState(item.qty);
   const [price, setPrice] = useState(item.price || '');
   const [aisle, setAisle] = useState(item.aisle || '');
-  const nameRef = useRef(null);
-
-  useEffect(() => {
-    nameRef.current?.focus();
-    nameRef.current?.select();
-  }, []);
 
   useEffect(() => {
     function handleKey(e) {
@@ -40,7 +34,6 @@ export default function EditModal({ item, onSave, onClose, onDelete }) {
           <div className="field">
             <label htmlFor="edit-name">Name</label>
             <input
-              ref={nameRef}
               id="edit-name"
               type="text"
               value={name}
