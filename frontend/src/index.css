@@ -47,4 +47,5 @@ body {
 
 html {
   overflow-x: hidden;
+  background: var(--gray-50);
 }
