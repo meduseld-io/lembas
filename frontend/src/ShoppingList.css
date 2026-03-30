@@ -1,0 +1,110 @@
+.add-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  position: relative;
+}
+.add-bar input {
+  flex: 1;
+  padding: 12px 16px;
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius);
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: var(--gray-800);
+  outline: none;
+  background: #fff;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.add-bar input::placeholder { color: var(--gray-400); }
+.add-bar input:focus {
+  border-color: var(--green-600);
+  box-shadow: 0 0 0 3px rgba(34, 135, 90, 0.12);
+}
+.add-bar button {
+  padding: 12px 20px;
+  background: var(--green-700);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, transform 0.1s;
+}
+.add-bar button:hover { background: var(--green-600); }
+.add-bar button:active { background: var(--green-900); transform: scale(0.97); }
+
+.suggestions {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 80px;
+  background: #fff;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 200;
+  box-shadow: var(--shadow-lg);
+}
+.suggestion-item {
+  padding: 11px 14px;
+  cursor: pointer;
+  font-size: 0.88rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.1s;
+}
+.suggestion-item:hover,
+.suggestion-item.highlighted { background: var(--green-50); }
+.suggestion-item .star { color: var(--gold-500); font-size: 0.75rem; }
+
+.section-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--gray-400);
+  margin: 20px 0 8px;
+  font-weight: 700;
+}
+
+.list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.list-header h2 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--gray-600);
+}
+.list-header h2 span {
+  font-weight: 500;
+  color: var(--gray-400);
+}
+.clear-btn {
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--red-500);
+  background: none;
+  border: 1.5px solid var(--red-500);
+  padding: 5px 12px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.clear-btn:hover { background: var(--red-50); }
+
+.empty {
+  text-align: center;
+  padding: 48px 20px;
+  color: var(--gray-400);
+}
+.empty-icon { font-size: 2.8rem; margin-bottom: 12px; }
+.empty p { font-size: 0.88rem; line-height: 1.5; }

@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lembas - Shopping List</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#2d6a4f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" sizes="180x180" href="favicon_io/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon_io/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon_io/favicon-16x16.png">
+  <link rel="icon" href="favicon_io/favicon.ico" sizes="any">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f0f4f0;
+      color: #1b1b1b;
+      min-height: 100vh;
+      padding-bottom: env(safe-area-inset-bottom, 0);
+    }
+    header {
+      background: #2d6a4f;
+      color: #fff;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    header h1 { font-size: 1.3rem; font-weight: 600; }
+    header h1 span { opacity: .7; font-weight: 400; font-size: .85rem; margin-left: 6px; }
+
+    .tabs {
+      display: flex;
+      background: #fff;
+      border-bottom: 1px solid #ddd;
+      position: sticky;
+      top: 54px;
+      z-index: 9;
+    }
+    .tab {
+      flex: 1;
+      padding: 12px;
+      text-align: center;
+      font-size: .9rem;
+      font-weight: 500;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      color: #666;
+      background: none;
+      border-top: none;
+      border-left: none;
+      border-right: none;
+    }
+    .tab.active { color: #2d6a4f; border-bottom-color: #2d6a4f; }
+
+    .container { max-width: 600px; margin: 0 auto; padding: 12px 16px; }
+
+    .add-bar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      position: relative;
+    }
+    .add-bar input {
+      flex: 1;
+      padding: 12px 14px;
+      border: 2px solid #ccc;
+      border-radius: 10px;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color .2s;
+    }
+    .add-bar input:focus { border-color: #2d6a4f; }
+    .add-bar button {
+      padding: 12px 18px;
+      background: #2d6a4f;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .add-bar button:active { background: #1b4332; }
+
+    .suggestions {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 70px;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      max-height: 200px;
+      overflow-y: auto;
+      z-index: 20;
+      display: none;
+      box-shadow: 0 4px 12px rgba(0,0,0,.1);
+    }
+    .suggestions.show { display: block; }
+    .suggestion-item {
+      padding: 10px 14px;
+      cursor: pointer;
+      font-size: .9rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .suggestion-item:hover, .suggestion-item.highlighted { background: #e8f5e9; }
+    .suggestion-item .star { color: #f9a825; font-size: .8rem; }
+
+    .section-label {
+      font-size: .75rem;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      color: #888;
+      margin: 16px 0 8px;
+      font-weight: 600;
+    }
+
+    .item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #fff;
+      padding: 12px 14px;
+      border-radius: 10px;
+      margin-bottom: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,.06);
+      transition: opacity .2s;
+    }
+    .item.checked { opacity: .5; }
+    .item.checked .item-name { text-decoration: line-through; }
+
+    .item input[type="checkbox"] {
+      width: 22px;
+      height: 22px;
+      accent-color: #2d6a4f;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .item-name { flex: 1; font-size: .95rem; word-break: break-word; }
+    .item-qty {
+      font-size: .8rem;
+      color: #666;
+      background: #f0f0f0;
+      padding: 2px 8px;
+      border-radius: 12px;
+      white-space: nowrap;
+    }
+    .item-actions { display: flex; gap: 4px; }
+    .item-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1.1rem;
+      padding: 4px;
+      border-radius: 6px;
+      line-height: 1;
+    }
+    .item-btn:hover { background: #f0f0f0; }
+    .item-btn.star-btn { color: #ccc; }
+    .item-btn.star-btn.starred { color: #f9a825; }
+    .item-btn.delete-btn { color: #c62828; }
+
+    .empty {
+      text-align: center;
+      padding: 40px 20px;
+      color: #999;
+    }
+    .empty-icon { font-size: 2.5rem; margin-bottom: 8px; }
+
+    .regulars-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 8px;
+    }
+    .regular-chip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #fff;
+      padding: 10px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: .9rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,.06);
+      border: 2px solid transparent;
+      transition: border-color .2s, background .2s;
+    }
+    .regular-chip:hover { border-color: #2d6a4f; }
+    .regular-chip.in-list { background: #e8f5e9; border-color: #2d6a4f; }
+    .regular-chip .remove-regular {
+      margin-left: auto;
+      color: #c62828;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: .9rem;
+      padding: 0 2px;
+      line-height: 1;
+    }
+
+    .list-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .list-header h2 { font-size: 1rem; font-weight: 600; }
+    .clear-btn {
+      font-size: .8rem;
+      color: #c62828;
+      background: none;
+      border: 1px solid #c62828;
+      padding: 4px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .clear-btn:hover { background: #fbe9e7; }
+
+    .qty-controls {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+    .qty-btn {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 1px solid #ccc;
+      background: #fff;
+      cursor: pointer;
+      font-size: .85rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+    .qty-btn:hover { background: #f0f0f0; }
+    .qty-val { min-width: 20px; text-align: center; font-size: .85rem; }
+
+    @media (max-width: 400px) {
+      .regulars-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1><img src="logo.png" alt="" width="28" height="28" style="vertical-align:middle;margin-right:8px;border-radius:4px;">Lembas<span>Shopping List</span></h1>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab active" data-tab="list" role="tab" aria-selected="true">Shopping List</button>
+    <button class="tab" data-tab="regulars" role="tab" aria-selected="false">Regulars</button>
+  </div>
+
+  <div class="container" id="list-view">
+    <div class="add-bar">
+      <input type="text" id="item-input" placeholder="Add an item..." autocomplete="off" aria-label="Item name">
+      <button id="add-btn" aria-label="Add item">Add</button>
+      <div class="suggestions" id="suggestions"></div>
+    </div>
+    <div class="list-header">
+      <h2>Items <span id="item-count"></span></h2>
+      <button class="clear-btn" id="clear-checked-btn">Clear checked</button>
+    </div>
+    <div id="items-container"></div>
+  </div>
+
+  <div class="container" id="regulars-view" style="display:none">
+    <p style="font-size:.85rem;color:#666;margin-bottom:14px;">
+      Tap a regular item to add it to your current list. Star items from the shopping list to save them here.
+    </p>
+    <div id="regulars-container"></div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'lembas_items';
+    const REGULARS_KEY = 'lembas_regulars';
+
+    let items = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    let regulars = JSON.parse(localStorage.getItem(REGULARS_KEY) || '[]');
+
+    const $input = document.getElementById('item-input');
+    const $addBtn = document.getElementById('add-btn');
+    const $itemsContainer = document.getElementById('items-container');
+    const $regularsContainer = document.getElementById('regulars-container');
+    const $suggestions = document.getElementById('suggestions');
+    const $itemCount = document.getElementById('item-count');
+    const $clearBtn = document.getElementById('clear-checked-btn');
+    const $listView = document.getElementById('list-view');
+    const $regularsView = document.getElementById('regulars-view');
+
+    function save() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+      localStorage.setItem(REGULARS_KEY, JSON.stringify(regulars));
+    }
+
+    function addItem(name, qty = 1) {
+      name = name.trim();
+      if (!name) return;
+      const existing = items.find(i => i.name.toLowerCase() === name.toLowerCase());
+      if (existing) {
+        existing.qty += 1;
+      } else {
+        items.push({ id: Date.now(), name, qty, checked: false });
+      }
+      save();
+      renderList();
+      $input.value = '';
+      hideSuggestions();
+    }
+
+    function renderList() {
+      const unchecked = items.filter(i => !i.checked);
+      const checked = items.filter(i => i.checked);
+      const total = items.length;
+      const done = checked.length;
+      $itemCount.textContent = total ? `(${done}/${total})` : '';
+
+      let html = '';
+      if (!items.length) {
+        html = '<div class="empty"><div class="empty-icon">🛒</div>Your list is empty.<br>Add items above or pick from your regulars.</div>';
+      } else {
+        if (unchecked.length) {
+          html += unchecked.map(i => itemHTML(i)).join('');
+        }
+        if (checked.length) {
+          html += '<div class="section-label">Done</div>';
+          html += checked.map(i => itemHTML(i)).join('');
+        }
+      }
+      $itemsContainer.innerHTML = html;
+    }
+
+    function itemHTML(item) {
+      const isRegular = regulars.some(r => r.toLowerCase() === item.name.toLowerCase());
+      return `
+        <div class="item ${item.checked ? 'checked' : ''}" data-id="${item.id}">
+          <input type="checkbox" ${item.checked ? 'checked' : ''} aria-label="Mark ${item.name} as done">
+          <span class="item-name">${esc(item.name)}</span>
+          ${item.qty > 1 ? `<span class="item-qty">x${item.qty}</span>` : ''}
+          <div class="qty-controls">
+            <button class="qty-btn" data-action="qty-down" aria-label="Decrease quantity">-</button>
+            <span class="qty-val">${item.qty}</span>
+            <button class="qty-btn" data-action="qty-up" aria-label="Increase quantity">+</button>
+          </div>
+          <div class="item-actions">
+            <button class="item-btn star-btn ${isRegular ? 'starred' : ''}" data-action="star" aria-label="${isRegular ? 'Remove from regulars' : 'Add to regulars'}">★</button>
+            <button class="item-btn delete-btn" data-action="delete" aria-label="Remove item">✕</button>
+          </div>
+        </div>`;
+    }
+
+    function esc(s) {
+      const d = document.createElement('div');
+      d.textContent = s;
+      return d.innerHTML;
+    }
+
+    $itemsContainer.addEventListener('click', e => {
+      const itemEl = e.target.closest('.item');
+      if (!itemEl) return;
+      const id = Number(itemEl.dataset.id);
+      const item = items.find(i => i.id === id);
+      if (!item) return;
+
+      if (e.target.type === 'checkbox') {
+        item.checked = e.target.checked;
+        save();
+        renderList();
+        return;
+      }
+
+      const action = e.target.dataset.action;
+      if (action === 'delete') {
+        items = items.filter(i => i.id !== id);
+        save();
+        renderList();
+      } else if (action === 'star') {
+        toggleRegular(item.name);
+        save();
+        renderList();
+      } else if (action === 'qty-up') {
+        item.qty += 1;
+        save();
+        renderList();
+      } else if (action === 'qty-down') {
+        if (item.qty > 1) {
+          item.qty -= 1;
+          save();
+          renderList();
+        }
+      }
+    });
+
+    function toggleRegular(name) {
+      const idx = regulars.findIndex(r => r.toLowerCase() === name.toLowerCase());
+      if (idx >= 0) {
+        regulars.splice(idx, 1);
+      } else {
+        regulars.push(name);
+      }
+    }
+
+    function renderRegulars() {
+      if (!regulars.length) {
+        $regularsContainer.innerHTML = '<div class="empty"><div class="empty-icon">⭐</div>No regular items yet.<br>Star items from your shopping list to save them here.</div>';
+        return;
+      }
+      const sorted = [...regulars].sort((a, b) => a.localeCompare(b));
+      $regularsContainer.innerHTML = '<div class="regulars-grid">' + sorted.map(name => {
+        const inList = items.some(i => i.name.toLowerCase() === name.toLowerCase());
+        return `<div class="regular-chip ${inList ? 'in-list' : ''}" data-name="${esc(name)}">
+          <span>${esc(name)}</span>
+          <button class="remove-regular" data-action="remove" aria-label="Remove ${name} from regulars">✕</button>
+        </div>`;
+      }).join('') + '</div>';
+    }
+
+    $regularsContainer.addEventListener('click', e => {
+      const chip = e.target.closest('.regular-chip');
+      if (!chip) return;
+      const name = chip.dataset.name;
+
+      if (e.target.dataset.action === 'remove') {
+        regulars = regulars.filter(r => r.toLowerCase() !== name.toLowerCase());
+        save();
+        renderRegulars();
+        return;
+      }
+
+      addItem(name);
+      renderRegulars();
+    });
+
+    $clearBtn.addEventListener('click', () => {
+      items = items.filter(i => !i.checked);
+      save();
+      renderList();
+    });
+
+    // Tabs
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
+        tab.classList.add('active');
+        tab.setAttribute('aria-selected', 'true');
+        if (tab.dataset.tab === 'list') {
+          $listView.style.display = '';
+          $regularsView.style.display = 'none';
+        } else {
+          $listView.style.display = 'none';
+          $regularsView.style.display = '';
+          renderRegulars();
+        }
+      });
+    });
+
+    // Add item
+    $addBtn.addEventListener('click', () => addItem($input.value));
+    $input.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        const highlighted = $suggestions.querySelector('.highlighted');
+        if (highlighted) {
+          addItem(highlighted.dataset.name);
+        } else {
+          addItem($input.value);
+        }
+      } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        navigateSuggestions(e.key === 'ArrowDown' ? 1 : -1);
+      } else if (e.key === 'Escape') {
+        hideSuggestions();
+      }
+    });
+
+    // Suggestions from regulars
+    $input.addEventListener('input', () => {
+      const val = $input.value.trim().toLowerCase();
+      if (!val) { hideSuggestions(); return; }
+      const matches = regulars.filter(r => r.toLowerCase().includes(val));
+      if (!matches.length) { hideSuggestions(); return; }
+      $suggestions.innerHTML = matches.map(m =>
+        `<div class="suggestion-item" data-name="${esc(m)}"><span class="star">★</span>${esc(m)}</div>`
+      ).join('');
+      $suggestions.classList.add('show');
+    });
+
+    $suggestions.addEventListener('click', e => {
+      const item = e.target.closest('.suggestion-item');
+      if (item) addItem(item.dataset.name);
+    });
+
+    function hideSuggestions() { $suggestions.classList.remove('show'); }
+    function navigateSuggestions(dir) {
+      const items = [...$suggestions.querySelectorAll('.suggestion-item')];
+      if (!items.length) return;
+      const current = items.findIndex(i => i.classList.contains('highlighted'));
+      items.forEach(i => i.classList.remove('highlighted'));
+      let next = current + dir;
+      if (next < 0) next = items.length - 1;
+      if (next >= items.length) next = 0;
+      items[next].classList.add('highlighted');
+    }
+
+    document.addEventListener('click', e => {
+      if (!e.target.closest('.add-bar')) hideSuggestions();
+    });
+
+    // Initial render
+    renderList();
+
+    // PWA registration
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').catch(e => console.error('SW registration failed:', e));
+    }
+  </script>
+</body>
+</html>
