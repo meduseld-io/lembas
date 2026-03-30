@@ -1,3 +1,14 @@
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.app-main {
+  flex: 1;
+}
+
 .app-header {
   background: linear-gradient(135deg, var(--green-700) 0%, var(--green-900) 100%);
   color: #fff;

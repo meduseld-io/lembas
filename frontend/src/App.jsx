@@ -33,7 +33,7 @@ export default function App() {
   }, [regulars]);
 
   return (
-    <>
+    <div className="app-shell">
       <header className="app-header">
         <img src="/logo.png" alt="Lembas" />
         <h1>Lembas</h1>
@@ -58,27 +58,29 @@ export default function App() {
         </button>
       </div>
 
-      {tab === 'list' ? (
-        <ShoppingList
-          items={items}
-          setItems={setItems}
-          addItem={addItem}
-          regulars={regulars}
-          toggleRegular={toggleRegular}
-          isRegular={isRegular}
-        />
-      ) : (
-        <RegularsGrid
-          regulars={regulars}
-          setRegulars={setRegulars}
-          items={items}
-          addItem={addItem}
-        />
-      )}
+      <main className="app-main">
+        {tab === 'list' ? (
+          <ShoppingList
+            items={items}
+            setItems={setItems}
+            addItem={addItem}
+            regulars={regulars}
+            toggleRegular={toggleRegular}
+            isRegular={isRegular}
+          />
+        ) : (
+          <RegularsGrid
+            regulars={regulars}
+            setRegulars={setRegulars}
+            items={items}
+            addItem={addItem}
+          />
+        )}
+      </main>
 
       <footer className="app-footer">
         <p>&copy; {new Date().getFullYear()} <a href="https://github.com/meduseld-io" target="_blank" rel="noopener noreferrer">meduseld.io</a></p>
       </footer>
-    </>
+    </div>
   );
 }
