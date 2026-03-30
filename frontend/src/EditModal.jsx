@@ -60,7 +60,6 @@ export default function EditModal({ item, onSave, onClose, onDelete }) {
                 inputMode="decimal"
                 value={price}
                 onChange={e => setPrice(e.target.value)}
-                placeholder="3.49"
               />
             </div>
             <div className="field field-grow">
@@ -70,7 +69,6 @@ export default function EditModal({ item, onSave, onClose, onDelete }) {
                 type="text"
                 value={aisle}
                 onChange={e => setAisle(e.target.value)}
-                placeholder="Dairy"
               />
             </div>
           </div>
