@@ -35,7 +35,7 @@ export default function ItemRow({ item, onCheck, onDelete, onQty, onStar, starre
 
   function handleTouchStart(e) {
     const touch = e.touches[0];
-    touchStart.current = { x: touch.clientX, y: touch.clientY, time: Date.now() };
+    touchStart.current = { x: touch.clientX, y: touch.clientY, time: Date.now(), target: e.target };
     touchMoved.current = false;
   }
 
@@ -69,7 +69,9 @@ export default function ItemRow({ item, onCheck, onDelete, onQty, onStar, starre
       setSwiping(false);
     } else if (!touchMoved.current && touchStart.current) {
       const elapsed = Date.now() - touchStart.current.time;
-      if (elapsed < 300) {
+      const t = touchStart.current.target;
+      const isInteractive = t.type === 'checkbox' || t.closest('.qty-controls') || t.closest('.item-actions') || t.closest('.drag-handle');
+      if (elapsed < 300 && !isInteractive) {
         onTap();
       }
     }
