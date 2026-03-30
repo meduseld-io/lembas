@@ -75,6 +75,10 @@ export default function App() {
           addItem={addItem}
         />
       )}
+
+      <footer className="app-footer">
+        <p>&copy; {new Date().getFullYear()} <a href="https://github.com/meduseld-io" target="_blank" rel="noopener noreferrer">meduseld.io</a></p>
+      </footer>
     </>
   );
 }

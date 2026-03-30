@@ -60,3 +60,17 @@
 @media (max-width: 400px) {
   .container { padding: 12px 12px 24px; }
 }
+
+.app-footer {
+  text-align: center;
+  padding: 24px 16px 16px;
+  font-size: 0.75rem;
+  color: var(--gray-400);
+}
+.app-footer a {
+  color: var(--green-600);
+  text-decoration: none;
+}
+.app-footer a:hover {
+  text-decoration: underline;
+}
