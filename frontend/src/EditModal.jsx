@@ -53,7 +53,7 @@ export default function EditModal({ item, onSave, onClose, onDelete }) {
               />
             </div>
             <div className="field field-sm">
-              <label htmlFor="edit-price">Price</label>
+              <label htmlFor="edit-price">Price ($)</label>
               <input
                 id="edit-price"
                 type="text"

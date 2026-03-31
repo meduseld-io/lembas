@@ -81,14 +81,11 @@ export default function ItemRow({ item, onCheck, onQty, onStar, starred, onTap, 
         aria-label={`Mark ${item.name} as done`}
       />
       <div className="item-content" aria-label={`Edit ${item.name}`}>
-        <span className="item-name">{item.name}</span>
-        {(item.price || item.aisle) && (
-          <span className="item-meta">
-            {item.price && <span className="meta-price">${item.price}</span>}
-            {item.price && item.aisle && <span className="meta-sep"> · </span>}
-            {item.aisle && <span className="meta-aisle">{item.aisle}</span>}
-          </span>
-        )}
+        <div className="item-name-row">
+          <span className="item-name">{item.name}</span>
+          {item.aisle && <span className="meta-aisle">{item.aisle}</span>}
+        </div>
+        {item.price && <span className="meta-price">${item.price}</span>}
       </div>
       <div className="qty-controls">
         <button className="qty-btn" onClick={() => onQty(item.id, -1)} aria-label="Decrease quantity">−</button>
