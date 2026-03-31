@@ -2,11 +2,13 @@ import { useState, useCallback } from 'react';
 import { useStorage } from './useStorage.js';
 import ShoppingList from './ShoppingList.jsx';
 import RegularsGrid from './RegularsGrid.jsx';
+import HelpModal from './HelpModal.jsx';
 import './App.css';
 
 export default function App() {
   const { items, setItems, regulars, setRegulars } = useStorage();
   const [tab, setTab] = useState('list');
+  const [showHelp, setShowHelp] = useState(false);
 
   const addItem = useCallback((name, qty = 1) => {
     name = name.trim();
@@ -37,6 +39,7 @@ export default function App() {
       <header className="app-header">
         <img src="/logo.png" alt="Lembas" />
         <h1>Lembas</h1>
+        <button className="help-btn" onClick={() => setShowHelp(true)} aria-label="Help">?</button>
       </header>
 
       <div className="tabs" role="tablist">
@@ -81,6 +84,8 @@ export default function App() {
       <footer className="app-footer">
         <p>&copy; {new Date().getFullYear()} <a href="https://github.com/meduseld-io" target="_blank" rel="noopener noreferrer">meduseld.io</a></p>
       </footer>
+
+      {showHelp && <HelpModal onClose={() => setShowHelp(false)} />}
     </div>
   );
 }
