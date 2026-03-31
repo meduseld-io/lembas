@@ -12,7 +12,6 @@
   cursor: pointer;
   user-select: none;
   -webkit-user-select: none;
-  touch-action: manipulation;
 }
 .item:hover { box-shadow: var(--shadow-md); }
 .item.checked { opacity: 0.45; }

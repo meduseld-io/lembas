@@ -16,10 +16,7 @@ export default function ItemRow({ item, onCheck, onQty, onStar, starred, onTap, 
     isDragging,
   } = useSortable({ id: item.id, disabled: !sortable });
 
-  const rowRef = useRef(null);
-
   const setRef = useCallback((node) => {
-    rowRef.current = node;
     setSortableRef(node);
   }, [setSortableRef]);
 
@@ -28,24 +25,34 @@ export default function ItemRow({ item, onCheck, onQty, onStar, starred, onTap, 
     transition,
     opacity: isDragging ? 0.4 : undefined,
     zIndex: isDragging ? 50 : undefined,
+    touchAction: sortable ? 'none' : undefined,
   };
 
-  function handleTouchStart(e) {
-    const touch = e.touches[0];
-    touchStart.current = { x: touch.clientX, y: touch.clientY, time: Date.now(), target: e.target };
-    touchMoved.current = false;
-  }
+  // Merge our tap detection with dnd-kit's listeners
+  const mergedListeners = sortable && listeners ? {
+    ...listeners,
+    onPointerDown: (e) => {
+      touchStart.current = { time: Date.now(), target: e.target };
+      touchMoved.current = false;
+      listeners.onPointerDown?.(e);
+    },
+  } : {
+    onPointerDown: (e) => {
+      touchStart.current = { time: Date.now(), target: e.target };
+      touchMoved.current = false;
+    },
+  };
 
-  function handleTouchMove() {
+  function handlePointerMove() {
     touchMoved.current = true;
   }
 
-  function handleTouchEnd() {
-    if (!touchMoved.current && touchStart.current) {
+  function handlePointerUp() {
+    if (!touchMoved.current && touchStart.current && !isDragging) {
       const elapsed = Date.now() - touchStart.current.time;
       const t = touchStart.current.target;
-      const isInteractive = t.type === 'checkbox' || t.closest('.qty-controls') || t.closest('.item-actions');
-      if (elapsed < 300 && !isInteractive) {
+      const isInteractive = t.type === 'checkbox' || t.closest?.('.qty-controls') || t.closest?.('.item-actions');
+      if (elapsed < 250 && !isInteractive) {
         onTap();
       }
     }
@@ -58,13 +65,12 @@ export default function ItemRow({ item, onCheck, onQty, onStar, starred, onTap, 
       ref={setRef}
       style={style}
       {...attributes}
-      {...(sortable ? listeners : {})}
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
+      {...mergedListeners}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
       onClick={(e) => {
         if (e.target.closest('.qty-controls') || e.target.closest('.item-actions') || e.target.type === 'checkbox') return;
-        onTap();
+        // Desktop fallback - onPointerUp handles tap on mobile
       }}
     >
       <input

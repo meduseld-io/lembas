@@ -1,7 +1,6 @@
 import { useState, useRef, useMemo } from 'react';
-import { DndContext, closestCenter, PointerSensor, TouchSensor, useSensor, useSensors, useDroppable, DragOverlay } from '@dnd-kit/core';
+import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, useDroppable } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
-import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import ItemRow from './ItemRow.jsx';
 import EditModal from './EditModal.jsx';
 import './ShoppingList.css';
@@ -35,8 +34,7 @@ export default function ShoppingList({ items, setItems, addItem, regulars, toggl
   }, [inputVal, regulars]);
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 300, tolerance: 8 } })
+    useSensor(PointerSensor, { activationConstraint: { delay: 300, tolerance: 5 } })
   );
 
   function handleAdd() {
