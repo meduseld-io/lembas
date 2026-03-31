@@ -9,7 +9,7 @@ function DeleteZone() {
   const { isOver, setNodeRef } = useDroppable({ id: 'delete-zone' });
   return (
     <div ref={setNodeRef} className={`delete-zone ${isOver ? 'over' : ''}`}>
-      🗑️ Drop here to delete
+      🗑️
     </div>
   );
 }

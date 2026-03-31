@@ -108,27 +108,29 @@
 /* Delete drop zone */
 .delete-zone {
   position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 20px;
-  padding-bottom: calc(20px + env(safe-area-inset-bottom, 0));
+  bottom: 24px;
+  bottom: calc(24px + env(safe-area-inset-bottom, 0));
+  left: 50%;
+  transform: translateX(-50%);
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
   background: var(--red-500);
   color: #fff;
-  font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 1.4rem;
   z-index: 200;
-  animation: slideUpZone 0.2s ease;
-  transition: background 0.15s;
+  box-shadow: 0 4px 16px rgba(220, 53, 69, 0.4);
+  animation: popIn 0.2s ease;
+  transition: transform 0.15s, background 0.15s;
 }
 .delete-zone.over {
   background: #a71d2a;
+  transform: translateX(-50%) scale(1.2);
 }
-@keyframes slideUpZone {
-  from { transform: translateY(100%); }
-  to { transform: translateY(0); }
+@keyframes popIn {
+  from { transform: translateX(-50%) scale(0); opacity: 0; }
+  to { transform: translateX(-50%) scale(1); opacity: 1; }
 }
