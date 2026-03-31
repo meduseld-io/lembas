@@ -1,6 +1,7 @@
 import { useState, useRef, useMemo } from 'react';
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, useDroppable } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
+import { Trash2, ShoppingCart, Star as StarIcon } from 'lucide-react';
 import ItemRow from './ItemRow.jsx';
 import EditModal from './EditModal.jsx';
 import './ShoppingList.css';
@@ -9,7 +10,7 @@ function DeleteZone() {
   const { isOver, setNodeRef } = useDroppable({ id: 'delete-zone' });
   return (
     <div ref={setNodeRef} className={`delete-zone ${isOver ? 'over' : ''}`}>
-      🗑️
+      <Trash2 size={24} />
     </div>
   );
 }
@@ -151,7 +152,7 @@ export default function ShoppingList({ items, setItems, addItem, regulars, toggl
                 className={`suggestion-item ${i === highlightIdx ? 'highlighted' : ''}`}
                 onMouseDown={() => { addItem(s); setInputVal(''); setShowSuggestions(false); }}
               >
-                <span className="star">★</span>{s}
+                <span className="star"><StarIcon size={14} fill="currentColor" /></span>{s}
               </div>
             ))}
           </div>
@@ -167,7 +168,7 @@ export default function ShoppingList({ items, setItems, addItem, regulars, toggl
 
       {!items.length ? (
         <div className="empty">
-          <div className="empty-icon">🛒</div>
+          <div className="empty-icon"><ShoppingCart size={40} /></div>
           <p>Your list is empty.<br />Add items above or pick from your regulars.</p>
         </div>
       ) : (

@@ -61,7 +61,7 @@
 }
 .suggestion-item:hover,
 .suggestion-item.highlighted { background: var(--green-50); }
-.suggestion-item .star { color: var(--gold-500); font-size: 0.75rem; }
+.suggestion-item .star { color: var(--gold-500); display: flex; }
 
 .section-label {
   font-size: 0.7rem;
@@ -106,5 +106,5 @@
   padding: 48px 20px;
   color: var(--gray-400);
 }
-.empty-icon { font-size: 2.8rem; margin-bottom: 12px; }
+.empty-icon { margin-bottom: 12px; color: var(--gray-300); }
 .empty p { font-size: 0.88rem; line-height: 1.5; }

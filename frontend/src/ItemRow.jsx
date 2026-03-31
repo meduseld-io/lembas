@@ -1,6 +1,7 @@
 import { useRef, useCallback } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { Star } from 'lucide-react';
 import './ItemRow.css';
 
 export default function ItemRow({ item, onCheck, onQty, onStar, starred, onTap, sortable = true }) {
@@ -99,7 +100,7 @@ export default function ItemRow({ item, onCheck, onQty, onStar, starred, onTap, 
           className={`item-btn star-btn ${starred ? 'starred' : ''}`}
           onClick={(e) => { e.stopPropagation(); onStar(); }}
           aria-label={starred ? 'Remove from regulars' : 'Add to regulars'}
-        >★</button>
+        ><Star size={18} fill={starred ? 'currentColor' : 'none'} /></button>
       </div>
     </div>
   );

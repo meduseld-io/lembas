@@ -64,10 +64,12 @@
 .help-section:last-child { border-bottom: none; }
 
 .help-icon {
-  font-size: 1.3rem;
   flex-shrink: 0;
   width: 32px;
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--green-600);
 }
 .help-title {
   font-size: 0.88rem;
