@@ -1,7 +1,7 @@
 .help-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
   align-items: flex-end;
   justify-content: center;
@@ -11,7 +11,7 @@
 @keyframes helpFadeIn { from { opacity: 0; } to { opacity: 1; } }
 
 .help-content {
-  background: #fff;
+  background: var(--bg-elevated);
   border-radius: 20px 20px 0 0;
   width: 100%;
   max-width: 560px;
@@ -42,24 +42,24 @@
 .help-header h3 {
   font-size: 1.05rem;
   font-weight: 700;
-  color: var(--gray-800);
+  color: var(--text);
 }
 .help-close {
   background: none;
   border: none;
   font-size: 1.1rem;
-  color: var(--gray-400);
+  color: var(--text-muted);
   cursor: pointer;
   padding: 4px 8px;
   border-radius: var(--radius-sm);
 }
-.help-close:hover { background: var(--gray-100); }
+.help-close:hover { background: var(--bg-card); }
 
 .help-section {
   display: flex;
   gap: 12px;
   padding: 12px 0;
-  border-bottom: 1px solid var(--gray-100);
+  border-bottom: 1px solid var(--border);
 }
 .help-section:last-child { border-bottom: none; }
 
@@ -69,16 +69,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--green-600);
+  color: var(--green-500);
 }
 .help-title {
   font-size: 0.88rem;
   font-weight: 600;
-  color: var(--gray-800);
+  color: var(--text);
   margin-bottom: 2px;
 }
 .help-section p:not(.help-title) {
   font-size: 0.82rem;
-  color: var(--gray-500);
+  color: var(--text-secondary);
   line-height: 1.45;
 }

@@ -2,11 +2,11 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  background: #fff;
+  background: var(--bg-card);
   padding: 12px 14px;
   border-radius: var(--radius);
   box-shadow: var(--shadow-sm);
-  border: 1px solid var(--gray-100);
+  border: 1px solid var(--border);
   margin-bottom: 8px;
   transition: opacity 0.25s, box-shadow 0.15s;
   cursor: pointer;
@@ -17,7 +17,7 @@
 .item.checked { opacity: 0.45; }
 .item.checked .item-name {
   text-decoration: line-through;
-  color: var(--gray-400);
+  color: var(--text-muted);
 }
 .item.dragging {
   box-shadow: var(--shadow-lg);
@@ -27,7 +27,7 @@
 .item input[type='checkbox'] {
   width: 20px;
   height: 20px;
-  accent-color: var(--green-700);
+  accent-color: var(--green-600);
   cursor: pointer;
   flex-shrink: 0;
 }
@@ -49,16 +49,17 @@
   font-size: 0.92rem;
   font-weight: 500;
   word-break: break-word;
+  color: var(--text);
 }
 .meta-aisle {
   font-size: 0.72rem;
-  color: var(--gray-400);
+  color: var(--text-muted);
   white-space: nowrap;
   flex-shrink: 0;
 }
 .meta-price {
   font-size: 0.75rem;
-  color: var(--green-600);
+  color: var(--green-500);
   font-weight: 500;
 }
 
@@ -66,7 +67,7 @@
   display: flex;
   align-items: center;
   gap: 2px;
-  background: var(--gray-100);
+  background: var(--bg-elevated);
   border-radius: var(--radius-full);
   padding: 2px;
   flex-shrink: 0;
@@ -76,26 +77,26 @@
   height: 26px;
   border-radius: 50%;
   border: none;
-  background: #fff;
+  background: var(--bg-card);
   cursor: pointer;
   font-family: inherit;
   font-size: 0.85rem;
   font-weight: 600;
-  color: var(--gray-600);
+  color: var(--text-secondary);
   display: flex;
   align-items: center;
   justify-content: center;
   transition: background 0.1s;
   box-shadow: var(--shadow-sm);
 }
-.qty-btn:hover { background: var(--gray-200); }
+.qty-btn:hover { background: var(--border-light); }
 .qty-btn:active { transform: scale(0.92); }
 .qty-val {
   min-width: 24px;
   text-align: center;
   font-size: 0.82rem;
   font-weight: 600;
-  color: var(--gray-600);
+  color: var(--text-secondary);
 }
 
 .item-actions { display: flex; gap: 2px; flex-shrink: 0; }
@@ -109,9 +110,9 @@
   line-height: 1;
   transition: background 0.1s, transform 0.1s;
 }
-.item-btn:hover { background: var(--gray-100); }
+.item-btn:hover { background: var(--bg-elevated); }
 .item-btn:active { transform: scale(0.9); }
-.item-btn.star-btn { color: var(--gray-300); }
+.item-btn.star-btn { color: var(--text-muted); }
 .item-btn.star-btn.starred { color: var(--gold-400); }
 
 /* Delete drop zone */

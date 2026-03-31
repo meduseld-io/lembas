@@ -11,23 +11,23 @@
   --green-700: #1a6b47;
   --green-600: #22875a;
   --green-500: #2d9e6b;
-  --green-100: #dcf5e7;
-  --green-50: #f0faf4;
-  --gray-50: #eef3f0;
-  --gray-100: #f1f3f2;
-  --gray-200: #e2e5e3;
-  --gray-300: #c8ccc9;
-  --gray-400: #9ca39e;
-  --gray-500: #6b736d;
-  --gray-600: #4a514c;
-  --gray-800: #1e2420;
+  --green-100: #1a3a2a;
+  --green-50: #162e23;
+  --bg: #1a1f1c;
+  --bg-card: #232a26;
+  --bg-elevated: #2a332e;
+  --border: #2e3830;
+  --border-light: #364038;
+  --text: #e0e4e1;
+  --text-secondary: #8a9a8f;
+  --text-muted: #5e6e63;
   --red-500: #dc3545;
-  --red-50: #fef2f2;
+  --red-50: #2a1a1a;
   --gold-500: #e6a817;
   --gold-400: #f0c040;
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.1);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.25);
+  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.3);
   --radius: 16px;
   --radius-sm: 12px;
   --radius-full: 9999px;
@@ -35,14 +35,14 @@
 
 html {
   overflow-x: hidden;
-  background: #eef3f0;
-  color-scheme: light;
+  background: #1a1f1c;
+  color-scheme: dark;
 }
 
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: #eef3f0 !important;
-  color: var(--gray-800);
+  background: #1a1f1c !important;
+  color: var(--text);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -52,6 +52,6 @@ body {
 }
 
 #root {
-  background: #eef3f0;
+  background: #1a1f1c;
   min-height: 100vh;
 }

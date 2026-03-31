@@ -1,9 +1,9 @@
 .shop-card {
-  background: #fff;
+  background: var(--bg-card);
   border-radius: var(--radius);
   margin-bottom: 8px;
   box-shadow: var(--shadow-sm);
-  border: 2px solid var(--gray-100);
+  border: 2px solid var(--border);
   overflow: hidden;
   transition: border-color 0.2s;
 }
@@ -23,7 +23,7 @@
 }
 
 .shop-chevron {
-  color: var(--gray-400);
+  color: var(--text-muted);
   display: flex;
   flex-shrink: 0;
 }
@@ -38,24 +38,24 @@
 .shop-date {
   font-size: 0.88rem;
   font-weight: 600;
-  color: var(--gray-800);
+  color: var(--text);
 }
 .shop-count {
   font-size: 0.72rem;
-  color: var(--gray-400);
+  color: var(--text-muted);
 }
 
 .shop-total {
   font-size: 0.88rem;
   font-weight: 600;
-  color: var(--green-600);
+  color: var(--green-500);
   flex-shrink: 0;
 }
 
 .shop-delete {
   background: none;
   border: none;
-  color: var(--gray-300);
+  color: var(--text-muted);
   cursor: pointer;
   padding: 4px;
   border-radius: var(--radius-sm);
@@ -66,7 +66,7 @@
 .shop-delete:hover { color: var(--red-500); }
 
 .shop-items {
-  border-top: 1px solid var(--gray-100);
+  border-top: 1px solid var(--border);
   padding: 8px 14px 12px;
 }
 .shop-item {
@@ -75,7 +75,7 @@
   gap: 8px;
   padding: 4px 0;
   font-size: 0.82rem;
-  color: var(--gray-500);
+  color: var(--text-secondary);
 }
 .shop-item-name {
   flex: 1;
@@ -83,11 +83,11 @@
   word-break: break-word;
 }
 .shop-item-qty {
-  color: var(--gray-400);
+  color: var(--text-muted);
   font-size: 0.75rem;
 }
 .shop-item-price {
-  color: var(--green-600);
+  color: var(--green-500);
   font-weight: 500;
   flex-shrink: 0;
 }

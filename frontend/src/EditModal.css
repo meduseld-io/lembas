@@ -1,7 +1,7 @@
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
   align-items: flex-end;
   justify-content: center;
@@ -11,7 +11,7 @@
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
 .modal-content {
-  background: #fff;
+  background: var(--bg-elevated);
   border-radius: 20px 20px 0 0;
   width: 100%;
   max-width: 560px;
@@ -37,7 +37,7 @@
   display: block;
   font-size: 0.72rem;
   font-weight: 600;
-  color: var(--gray-500);
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.04em;
   margin-bottom: 4px;
@@ -45,20 +45,20 @@
 .field input {
   width: 100%;
   padding: 10px 12px;
-  border: 2px solid var(--gray-200);
+  border: 2px solid var(--border);
   border-radius: var(--radius-sm);
   font-family: inherit;
   font-size: 1rem;
-  color: var(--gray-800);
+  color: var(--text);
   outline: none;
-  background: #fff;
+  background: var(--bg-card);
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 .field input:focus {
   border-color: var(--green-600);
-  box-shadow: 0 0 0 3px rgba(34, 135, 90, 0.12);
+  box-shadow: 0 0 0 3px rgba(34, 135, 90, 0.2);
 }
-.field input::placeholder { color: var(--gray-400); }
+.field input::placeholder { color: var(--text-muted); }
 
 .field-row {
   display: flex;
@@ -98,8 +98,8 @@
 .btn-cancel {
   padding: 9px 16px;
   background: none;
-  color: var(--gray-500);
-  border: 1.5px solid var(--gray-200);
+  color: var(--text-secondary);
+  border: 1.5px solid var(--border);
   border-radius: var(--radius-sm);
   font-family: inherit;
   font-size: 0.85rem;
@@ -107,7 +107,7 @@
   cursor: pointer;
   transition: background 0.15s;
 }
-.btn-cancel:hover { background: var(--gray-100); }
+.btn-cancel:hover { background: var(--bg-card); }
 
 .btn-delete {
   padding: 9px 16px;
