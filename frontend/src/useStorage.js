@@ -2,17 +2,19 @@ import { useState, useCallback } from 'react';
 
 const ITEMS_KEY = 'lembas_items';
 const REGULARS_KEY = 'lembas_regulars';
+const SHOPS_KEY = 'lembas_shops';
 
 function loadItems() {
   try {
     const raw = localStorage.getItem(ITEMS_KEY);
     const items = raw ? JSON.parse(raw) : [];
-    // Migrate old items that lack new fields
-    return items.map(item => ({
-      ...item,
-      price: item.price ?? '',
-      aisle: item.aisle ?? '',
-    }));
+    return items
+      .filter(item => !item.checked)
+      .map(item => ({
+        ...item,
+        price: item.price ?? '',
+        aisle: item.aisle ?? '',
+      }));
   } catch (e) {
     console.error('Failed to load items from localStorage:', e);
     return [];
@@ -29,9 +31,20 @@ function loadRegulars() {
   }
 }
 
+function loadShops() {
+  try {
+    const raw = localStorage.getItem(SHOPS_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    console.error('Failed to load shops from localStorage:', e);
+    return [];
+  }
+}
+
 export function useStorage() {
   const [items, setItemsState] = useState(loadItems);
   const [regulars, setRegularsState] = useState(loadRegulars);
+  const [shops, setShopsState] = useState(loadShops);
 
   const setItems = useCallback((updater) => {
     setItemsState(prev => {
@@ -49,5 +62,13 @@ export function useStorage() {
     });
   }, []);
 
-  return { items, setItems, regulars, setRegulars };
+  const setShops = useCallback((updater) => {
+    setShopsState(prev => {
+      const next = typeof updater === 'function' ? updater(prev) : updater;
+      localStorage.setItem(SHOPS_KEY, JSON.stringify(next));
+      return next;
+    });
+  }, []);
+
+  return { items, setItems, regulars, setRegulars, shops, setShops };
 }

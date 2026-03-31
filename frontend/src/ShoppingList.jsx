@@ -3,6 +3,7 @@ import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, useDro
 import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
 import { Trash2, ShoppingCart, Star as StarIcon } from 'lucide-react';
 import ItemRow from './ItemRow.jsx';
+import ShopCard from './ShopCard.jsx';
 import EditModal from './EditModal.jsx';
 import './ShoppingList.css';
 
@@ -15,7 +16,7 @@ function DeleteZone() {
   );
 }
 
-export default function ShoppingList({ items, setItems, addItem, regulars, toggleRegular, isRegular }) {
+export default function ShoppingList({ items, setItems, addItem, regulars, toggleRegular, isRegular, shops, setShops }) {
   const [inputVal, setInputVal] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [highlightIdx, setHighlightIdx] = useState(-1);
@@ -23,10 +24,14 @@ export default function ShoppingList({ items, setItems, addItem, regulars, toggl
   const [isDragging, setIsDragging] = useState(false);
   const inputRef = useRef(null);
 
-  const unchecked = useMemo(() => items.filter(i => !i.checked), [items]);
-  const checked = useMemo(() => items.filter(i => i.checked), [items]);
   const total = items.length;
-  const done = checked.length;
+
+  const estimatedTotal = useMemo(() => {
+    return items.reduce((sum, i) => {
+      const p = parseFloat(i.price);
+      return sum + (isNaN(p) ? 0 : p * (i.qty || 1));
+    }, 0);
+  }, [items]);
 
   const suggestions = useMemo(() => {
     const val = inputVal.trim().toLowerCase();
@@ -90,6 +95,19 @@ export default function ShoppingList({ items, setItems, addItem, regulars, toggl
       return;
     }
 
+    // Dropped on a shop card
+    if (typeof over.id === 'string' && over.id.startsWith('shop-')) {
+      const shopId = parseInt(over.id.replace('shop-', ''));
+      const item = items.find(i => i.id === active.id);
+      if (!item) return;
+      setShops(prev => prev.map(s => {
+        if (s.id !== shopId) return s;
+        return { ...s, items: [...s.items, { name: item.name, qty: item.qty, price: item.price, aisle: item.aisle }] };
+      }));
+      setItems(prev => prev.filter(i => i.id !== active.id));
+      return;
+    }
+
     if (active.id !== over.id) {
       setItems(prev => {
         const oldIndex = prev.findIndex(i => i.id === active.id);
@@ -104,11 +122,27 @@ export default function ShoppingList({ items, setItems, addItem, regulars, toggl
   }
 
   function handleCheck(id) {
-    setItems(prev => prev.map(i => i.id === id ? { ...i, checked: !i.checked } : i));
+    const item = items.find(i => i.id === id);
+    if (!item) return;
+
+    const today = new Date().toISOString().split('T')[0];
+    setShops(prev => {
+      const existing = prev.find(s => s.date === today);
+      const shopItem = { name: item.name, qty: item.qty, price: item.price, aisle: item.aisle };
+      if (existing) {
+        return prev.map(s => s.id === existing.id ? { ...s, items: [...s.items, shopItem] } : s);
+      }
+      return [{ id: Date.now(), date: today, items: [shopItem] }, ...prev];
+    });
+    setItems(prev => prev.filter(i => i.id !== id));
   }
 
   function handleDelete(id) {
     setItems(prev => prev.filter(i => i.id !== id));
+  }
+
+  function handleDeleteShop(shopId) {
+    setShops(prev => prev.filter(s => s.id !== shopId));
   }
 
   function handleQty(id, delta) {
@@ -122,10 +156,6 @@ export default function ShoppingList({ items, setItems, addItem, regulars, toggl
   function handleSaveEdit(updated) {
     setItems(prev => prev.map(i => i.id === updated.id ? { ...i, ...updated } : i));
     setEditingItem(null);
-  }
-
-  function clearChecked() {
-    setItems(prev => prev.filter(i => !i.checked));
   }
 
   return (
@@ -160,13 +190,13 @@ export default function ShoppingList({ items, setItems, addItem, regulars, toggl
       </div>
 
       <div className="list-header">
-        <h2>Items {total > 0 && <span>({done}/{total})</span>}</h2>
-        {done > 0 && (
-          <button className="clear-btn" onClick={clearChecked}>Clear checked</button>
+        <h2>Items {total > 0 && <span>({total})</span>}</h2>
+        {estimatedTotal > 0 && (
+          <span className="estimated-total">Est. ${estimatedTotal.toFixed(2)}</span>
         )}
       </div>
 
-      {!items.length ? (
+      {!items.length && !shops.length ? (
         <div className="empty">
           <div className="empty-icon"><ShoppingCart size={40} /></div>
           <p>Your list is empty.<br />Add items above or pick from your regulars.</p>
@@ -179,24 +209,9 @@ export default function ShoppingList({ items, setItems, addItem, regulars, toggl
           onDragEnd={handleDragEnd}
           onDragCancel={handleDragCancel}
         >
-          <SortableContext items={unchecked.map(i => i.id)} strategy={verticalListSortingStrategy}>
-            {unchecked.map(item => (
-              <ItemRow
-                key={item.id}
-                item={item}
-                onCheck={handleCheck}
-                onQty={handleQty}
-                onStar={() => toggleRegular(item.name)}
-                starred={isRegular(item.name)}
-                onTap={() => setEditingItem(item)}
-              />
-            ))}
-          </SortableContext>
-
-          {checked.length > 0 && (
-            <>
-              <div className="section-label">Done</div>
-              {checked.map(item => (
+          {items.length > 0 && (
+            <SortableContext items={items.map(i => i.id)} strategy={verticalListSortingStrategy}>
+              {items.map(item => (
                 <ItemRow
                   key={item.id}
                   item={item}
@@ -205,8 +220,22 @@ export default function ShoppingList({ items, setItems, addItem, regulars, toggl
                   onStar={() => toggleRegular(item.name)}
                   starred={isRegular(item.name)}
                   onTap={() => setEditingItem(item)}
-                  sortable={false}
                 />
+              ))}
+            </SortableContext>
+          )}
+
+          {!items.length && (
+            <div className="empty empty-sm">
+              <p>All items completed. Add more above.</p>
+            </div>
+          )}
+
+          {shops.length > 0 && (
+            <>
+              <div className="section-label">Previous Shops</div>
+              {shops.map(shop => (
+                <ShopCard key={shop.id} shop={shop} onDelete={handleDeleteShop} />
               ))}
             </>
           )}

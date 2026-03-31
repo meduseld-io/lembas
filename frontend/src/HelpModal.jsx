@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Plus, Pencil, ArrowUpDown, Trash2, Star, CheckSquare } from 'lucide-react';
+import { Plus, Pencil, ArrowUpDown, Trash2, Star, CheckSquare, ShoppingBag } from 'lucide-react';
 import './HelpModal.css';
 
 export default function HelpModal({ onClose }) {
@@ -62,8 +62,16 @@ export default function HelpModal({ onClose }) {
         <div className="help-section">
           <div className="help-icon"><CheckSquare size={20} /></div>
           <div>
-            <p className="help-title">Check off items</p>
-            <p>Tap the checkbox to mark items as done. Use "Clear checked" to remove them all at once.</p>
+            <p className="help-title">Complete items</p>
+            <p>Tap the checkbox to mark an item as bought. Completed items are grouped into a shop for that day with a running total.</p>
+          </div>
+        </div>
+
+        <div className="help-section">
+          <div className="help-icon"><ShoppingBag size={20} /></div>
+          <div>
+            <p className="help-title">Shop history</p>
+            <p>Previous shops appear below your list. Tap to expand and see what was bought. Drag items onto a past shop to add them retroactively.</p>
           </div>
         </div>
       </div>

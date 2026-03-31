@@ -6,7 +6,7 @@ import HelpModal from './HelpModal.jsx';
 import './App.css';
 
 export default function App() {
-  const { items, setItems, regulars, setRegulars } = useStorage();
+  const { items, setItems, regulars, setRegulars, shops, setShops } = useStorage();
   const [tab, setTab] = useState('list');
   const [showHelp, setShowHelp] = useState(false);
 
@@ -70,6 +70,8 @@ export default function App() {
             regulars={regulars}
             toggleRegular={toggleRegular}
             isRegular={isRegular}
+            shops={shops}
+            setShops={setShops}
           />
         ) : (
           <RegularsGrid
