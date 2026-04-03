@@ -62,4 +62,4 @@ Lembas is developed and maintained by [@quietarcade](https://github.com/quietarc
 
 ## License
 
-Source Available - see [LICENSE](LICENSE).
+MIT - see [LICENSE](LICENSE).
