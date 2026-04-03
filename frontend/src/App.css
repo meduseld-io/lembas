@@ -137,3 +137,33 @@
 .app-footer a:hover {
   text-decoration: underline;
 }
+
+/* Shared delete drop zone (used by both Shopping and To-Do modes) */
+.delete-zone {
+  position: fixed;
+  bottom: 24px;
+  bottom: calc(24px + env(safe-area-inset-bottom, 0));
+  left: 50%;
+  transform: translateX(-50%);
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--red-500);
+  color: #fff;
+  font-size: 1.4rem;
+  z-index: 200;
+  box-shadow: 0 4px 16px rgba(220, 53, 69, 0.4);
+  animation: deleteZonePopIn 0.2s ease;
+  transition: transform 0.15s, background 0.15s;
+}
+.delete-zone.over {
+  background: #a71d2a;
+  transform: translateX(-50%) scale(1.2);
+}
+@keyframes deleteZonePopIn {
+  from { transform: translateX(-50%) scale(0); opacity: 0; }
+  to { transform: translateX(-50%) scale(1); opacity: 1; }
+}
