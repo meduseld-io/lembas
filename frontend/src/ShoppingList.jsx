@@ -1,5 +1,5 @@
 import { useState, useRef, useMemo, useCallback } from 'react';
-import { DndContext, closestCenter, rectIntersection, PointerSensor, useSensor, useSensors, useDroppable } from '@dnd-kit/core';
+import { DndContext, closestCenter, pointerWithin, PointerSensor, useSensor, useSensors, useDroppable } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
 import { Trash2, ShoppingCart, Star as StarIcon } from 'lucide-react';
 import ItemRow from './ItemRow.jsx';
@@ -43,16 +43,16 @@ export default function ShoppingList({ items, setItems, addItem, regulars, toggl
     useSensor(PointerSensor, { activationConstraint: { delay: 300, tolerance: 5 } })
   );
 
-  // Use rect intersection for delete/shop zones (requires actual overlap),
+  // Use pointerWithin for delete/shop zones (checks if pointer is inside the droppable),
   // closestCenter for sortable items
   const collisionDetection = useCallback((args) => {
-    const deleteHit = rectIntersection({
+    const zoneHit = pointerWithin({
       ...args,
       droppableContainers: args.droppableContainers.filter(
         c => c.id === 'delete-zone' || String(c.id).startsWith('shop-')
       ),
     });
-    if (deleteHit.length > 0) return deleteHit;
+    if (zoneHit.length > 0) return zoneHit;
     return closestCenter({
       ...args,
       droppableContainers: args.droppableContainers.filter(

@@ -1,5 +1,5 @@
 import { useState, useRef, useMemo, useCallback } from 'react';
-import { DndContext, closestCenter, rectIntersection, PointerSensor, useSensor, useSensors, useDroppable } from '@dnd-kit/core';
+import { DndContext, closestCenter, pointerWithin, PointerSensor, useSensor, useSensors, useDroppable } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
 import { Trash2, ListChecks, Star as StarIcon } from 'lucide-react';
 import TodoItem from './TodoItem.jsx';
@@ -35,11 +35,11 @@ export default function TodoList({ todos, setTodos, regulars, toggleRegular, isR
   );
 
   const collisionDetection = useCallback((args) => {
-    const deleteHit = rectIntersection({
+    const zoneHit = pointerWithin({
       ...args,
       droppableContainers: args.droppableContainers.filter(c => c.id === 'delete-zone'),
     });
-    if (deleteHit.length > 0) return deleteHit;
+    if (zoneHit.length > 0) return zoneHit;
     return closestCenter({
       ...args,
       droppableContainers: args.droppableContainers.filter(c => c.id !== 'delete-zone'),
