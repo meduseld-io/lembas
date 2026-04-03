@@ -1,0 +1,22 @@
+.todo-completed-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.clear-completed-btn {
+  font-family: inherit;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  padding: 3px 10px;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+.clear-completed-btn:hover {
+  color: var(--red-500);
+  border-color: var(--red-500);
+}

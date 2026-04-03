@@ -1,0 +1,41 @@
+.todo-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin-bottom: 6px;
+  cursor: grab;
+  user-select: none;
+  transition: opacity 0.15s, box-shadow 0.15s;
+}
+.todo-item.dragging {
+  box-shadow: var(--shadow-lg);
+  cursor: grabbing;
+}
+.todo-item.done {
+  opacity: 0.45;
+}
+.todo-item.done .todo-name {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+.todo-item input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--green-500);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.todo-name {
+  flex: 1;
+  font-size: 0.95rem;
+  color: var(--text);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

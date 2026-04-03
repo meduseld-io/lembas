@@ -31,7 +31,36 @@
   font-size: 1.15rem;
   font-weight: 700;
   letter-spacing: -0.01em;
-  flex: 1;
+}
+
+.mode-switcher {
+  display: flex;
+  gap: 2px;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: var(--radius-full);
+  padding: 2px;
+  margin-left: auto;
+}
+.mode-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 28px;
+  border: none;
+  border-radius: var(--radius-full);
+  background: none;
+  color: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  position: relative;
+}
+.mode-btn:hover {
+  color: rgba(255, 255, 255, 0.7);
+}
+.mode-btn.active {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
 }
 
 .help-btn {
