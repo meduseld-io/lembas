@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { Star } from 'lucide-react';
 import './RegularsGrid.css';
 
-export default function RegularsGrid({ regulars, setRegulars, items, addItem }) {
+export default function RegularsGrid({ regulars, setRegulars, items, addItem, mode }) {
   const sorted = useMemo(() => [...regulars].sort((a, b) => a.localeCompare(b)), [regulars]);
 
   function isInList(name) {
@@ -13,12 +13,14 @@ export default function RegularsGrid({ regulars, setRegulars, items, addItem }) 
     setRegulars(prev => prev.filter(r => r.toLowerCase() !== name.toLowerCase()));
   }
 
+  const listLabel = mode === 'todo' ? 'task list' : 'shopping list';
+
   if (!regulars.length) {
     return (
       <div className="container">
         <div className="empty">
           <div className="empty-icon"><Star size={40} /></div>
-          <p>No regular items yet.<br />Star items from your shopping list to save them here.</p>
+          <p>No regular items yet.<br />Star items from your {listLabel} to save them here.</p>
         </div>
       </div>
     );
@@ -27,7 +29,7 @@ export default function RegularsGrid({ regulars, setRegulars, items, addItem }) 
   return (
     <div className="container">
       <p className="regulars-info">
-        Tap a regular item to add it to your current list. Star items from the shopping list to save them here.
+        Tap a regular item to add it to your current list. Star items from the {listLabel} to save them here.
       </p>
       <div className="regulars-grid">
         {sorted.map(name => (

@@ -24,6 +24,16 @@ export default function App() {
     });
   }, [setItems]);
 
+  const addTodo = useCallback((name) => {
+    name = name.trim();
+    if (!name) return;
+    setTodos(prev => {
+      const existing = prev.find(t => t.name.toLowerCase() === name.toLowerCase() && !t.done);
+      if (existing) return prev;
+      return [...prev, { id: Date.now(), name, done: false }];
+    });
+  }, [setTodos]);
+
   const toggleRegular = useCallback((name) => {
     setRegulars(prev => {
       const idx = prev.findIndex(r => r.toLowerCase() === name.toLowerCase());
@@ -36,6 +46,8 @@ export default function App() {
     return regulars.some(r => r.toLowerCase() === name.toLowerCase());
   }, [regulars]);
 
+  const listTabLabel = mode === 'todo' ? 'Tasks' : 'Shopping List';
+
   return (
     <div className="app-shell">
       <header className="app-header">
@@ -44,17 +56,15 @@ export default function App() {
         <div className="mode-switcher">
           <button
             className={`mode-btn ${mode === 'todo' ? 'active' : ''}`}
-            onClick={() => setMode('todo')}
+            onClick={() => { setMode('todo'); setTab('list'); }}
             aria-label="To-Do mode"
-            data-tooltip="To-Do"
           >
             <ListChecks size={16} />
           </button>
           <button
             className={`mode-btn ${mode === 'shopping' ? 'active' : ''}`}
-            onClick={() => setMode('shopping')}
+            onClick={() => { setMode('shopping'); setTab('list'); }}
             aria-label="Shopping mode"
-            data-tooltip="Shopping"
           >
             <ShoppingCart size={16} />
           </button>
@@ -62,31 +72,43 @@ export default function App() {
         <button className="help-btn" onClick={() => setShowHelp(true)} aria-label="Help">?</button>
       </header>
 
-      {mode === 'shopping' && (
-        <div className="tabs" role="tablist">
-          <button
-            className={`tab ${tab === 'list' ? 'active' : ''}`}
-            role="tab"
-            aria-selected={tab === 'list'}
-            onClick={() => setTab('list')}
-          >
-            Shopping List
-          </button>
-          <button
-            className={`tab ${tab === 'regulars' ? 'active' : ''}`}
-            role="tab"
-            aria-selected={tab === 'regulars'}
-            onClick={() => setTab('regulars')}
-          >
-            Regulars
-          </button>
-        </div>
-      )}
+      <div className="tabs" role="tablist">
+        <button
+          className={`tab ${tab === 'list' ? 'active' : ''}`}
+          role="tab"
+          aria-selected={tab === 'list'}
+          onClick={() => setTab('list')}
+        >
+          {listTabLabel}
+        </button>
+        <button
+          className={`tab ${tab === 'regulars' ? 'active' : ''}`}
+          role="tab"
+          aria-selected={tab === 'regulars'}
+          onClick={() => setTab('regulars')}
+        >
+          Regulars
+        </button>
+      </div>
 
       <main className="app-main">
-        {mode === 'todo' ? (
-          <TodoList todos={todos} setTodos={setTodos} />
-        ) : tab === 'list' ? (
+        {tab === 'regulars' ? (
+          <RegularsGrid
+            regulars={regulars}
+            setRegulars={setRegulars}
+            items={mode === 'todo' ? todos.filter(t => !t.done) : items}
+            addItem={mode === 'todo' ? addTodo : addItem}
+            mode={mode}
+          />
+        ) : mode === 'todo' ? (
+          <TodoList
+            todos={todos}
+            setTodos={setTodos}
+            regulars={regulars}
+            toggleRegular={toggleRegular}
+            isRegular={isRegular}
+          />
+        ) : (
           <ShoppingList
             items={items}
             setItems={setItems}
@@ -96,13 +118,6 @@ export default function App() {
             isRegular={isRegular}
             shops={shops}
             setShops={setShops}
-          />
-        ) : (
-          <RegularsGrid
-            regulars={regulars}
-            setRegulars={setRegulars}
-            items={items}
-            addItem={addItem}
           />
         )}
       </main>

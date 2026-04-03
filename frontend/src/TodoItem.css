@@ -39,3 +39,22 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+.todo-star-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: color 0.15s;
+}
+.todo-star-btn:hover {
+  color: var(--gold-400);
+}
+.todo-star-btn.starred {
+  color: var(--gold-500);
+}

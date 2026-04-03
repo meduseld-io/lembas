@@ -60,6 +60,14 @@ export default function HelpModal({ onClose, mode }) {
                 <p>While dragging, drop the task on the trash icon at the bottom. You can also clear all completed tasks at once.</p>
               </div>
             </div>
+
+            <div className="help-section">
+              <div className="help-icon"><Star size={20} /></div>
+              <div>
+                <p className="help-title">Regular tasks</p>
+                <p>Tap the star on any task to save it as a regular. Switch to the Regulars tab to quickly re-add saved tasks.</p>
+              </div>
+            </div>
           </>
         ) : (
           <>

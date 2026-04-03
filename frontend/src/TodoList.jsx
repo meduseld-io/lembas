@@ -1,7 +1,7 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useMemo, useCallback } from 'react';
 import { DndContext, closestCenter, rectIntersection, PointerSensor, useSensor, useSensors, useDroppable } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
-import { Trash2, ListChecks } from 'lucide-react';
+import { Trash2, ListChecks, Star as StarIcon } from 'lucide-react';
 import TodoItem from './TodoItem.jsx';
 import './TodoList.css';
 
@@ -14,13 +14,21 @@ function DeleteZone() {
   );
 }
 
-export default function TodoList({ todos, setTodos }) {
+export default function TodoList({ todos, setTodos, regulars, toggleRegular, isRegular }) {
   const [inputVal, setInputVal] = useState('');
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [highlightIdx, setHighlightIdx] = useState(-1);
   const [isDragging, setIsDragging] = useState(false);
   const inputRef = useRef(null);
 
   const pending = todos.filter(t => !t.done);
   const completed = todos.filter(t => t.done);
+
+  const suggestions = useMemo(() => {
+    const val = inputVal.trim().toLowerCase();
+    if (!val) return [];
+    return regulars.filter(r => r.toLowerCase().includes(val));
+  }, [inputVal, regulars]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { delay: 300, tolerance: 5 } })
@@ -38,15 +46,45 @@ export default function TodoList({ todos, setTodos }) {
     });
   }, []);
 
-  function handleAdd() {
-    const name = inputVal.trim();
+  function addTodo(name) {
+    name = (name || inputVal).trim();
     if (!name) return;
-    setTodos(prev => [...prev, { id: Date.now(), name, done: false }]);
+    setTodos(prev => {
+      const existing = prev.find(t => t.name.toLowerCase() === name.toLowerCase() && !t.done);
+      if (existing) return prev;
+      return [...prev, { id: Date.now(), name, done: false }];
+    });
     setInputVal('');
+    setShowSuggestions(false);
+    setHighlightIdx(-1);
   }
 
   function handleKeyDown(e) {
-    if (e.key === 'Enter') handleAdd();
+    if (e.key === 'Enter') {
+      if (highlightIdx >= 0 && suggestions[highlightIdx]) {
+        addTodo(suggestions[highlightIdx]);
+      } else {
+        addTodo();
+      }
+    } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (!suggestions.length) return;
+      setHighlightIdx(prev => {
+        const dir = e.key === 'ArrowDown' ? 1 : -1;
+        let next = prev + dir;
+        if (next < 0) next = suggestions.length - 1;
+        if (next >= suggestions.length) next = 0;
+        return next;
+      });
+    } else if (e.key === 'Escape') {
+      setShowSuggestions(false);
+    }
+  }
+
+  function handleInputChange(e) {
+    setInputVal(e.target.value);
+    setHighlightIdx(-1);
+    setShowSuggestions(e.target.value.trim().length > 0);
   }
 
   function handleToggle(id) {
@@ -93,13 +131,28 @@ export default function TodoList({ todos, setTodos }) {
           ref={inputRef}
           type="text"
           value={inputVal}
-          onChange={e => setInputVal(e.target.value)}
+          onChange={handleInputChange}
           onKeyDown={handleKeyDown}
+          onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
+          onFocus={() => { if (inputVal.trim()) setShowSuggestions(true); }}
           placeholder="Add a task..."
           autoComplete="off"
           aria-label="Task name"
         />
-        <button onClick={handleAdd} aria-label="Add task">Add</button>
+        <button onClick={() => addTodo()} aria-label="Add task">Add</button>
+        {showSuggestions && suggestions.length > 0 && (
+          <div className="suggestions show">
+            {suggestions.map((s, i) => (
+              <div
+                key={s}
+                className={`suggestion-item ${i === highlightIdx ? 'highlighted' : ''}`}
+                onMouseDown={() => { addTodo(s); }}
+              >
+                <span className="star"><StarIcon size={14} fill="currentColor" /></span>{s}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="list-header">
@@ -122,7 +175,14 @@ export default function TodoList({ todos, setTodos }) {
           {pending.length > 0 && (
             <SortableContext items={pending.map(t => t.id)} strategy={verticalListSortingStrategy}>
               {pending.map(todo => (
-                <TodoItem key={todo.id} item={todo} onToggle={handleToggle} onDelete={handleDelete} />
+                <TodoItem
+                  key={todo.id}
+                  item={todo}
+                  onToggle={handleToggle}
+                  onDelete={handleDelete}
+                  onStar={() => toggleRegular(todo.name)}
+                  starred={isRegular(todo.name)}
+                />
               ))}
             </SortableContext>
           )}
@@ -140,7 +200,15 @@ export default function TodoList({ todos, setTodos }) {
                 <button className="clear-completed-btn" onClick={handleClearCompleted}>Clear</button>
               </div>
               {completed.map(todo => (
-                <TodoItem key={todo.id} item={todo} onToggle={handleToggle} onDelete={handleDelete} sortable={false} />
+                <TodoItem
+                  key={todo.id}
+                  item={todo}
+                  onToggle={handleToggle}
+                  onDelete={handleDelete}
+                  onStar={() => toggleRegular(todo.name)}
+                  starred={isRegular(todo.name)}
+                  sortable={false}
+                />
               ))}
             </>
           )}
