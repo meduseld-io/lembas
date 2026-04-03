@@ -7,10 +7,10 @@ import ShopCard from './ShopCard.jsx';
 import EditModal from './EditModal.jsx';
 import './ShoppingList.css';
 
-function DeleteZone() {
+function DeleteZone({ visible }) {
   const { isOver, setNodeRef } = useDroppable({ id: 'delete-zone' });
   return (
-    <div ref={setNodeRef} className={`delete-zone ${isOver ? 'over' : ''}`}>
+    <div ref={setNodeRef} className={`delete-zone ${visible ? 'visible' : ''} ${isOver ? 'over' : ''}`}>
       <Trash2 size={24} />
     </div>
   );
@@ -258,7 +258,7 @@ export default function ShoppingList({ items, setItems, addItem, regulars, toggl
             </>
           )}
 
-          {isDragging && <DeleteZone />}
+          <DeleteZone visible={isDragging} />
         </DndContext>
       )}
 
