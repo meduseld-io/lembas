@@ -1,5 +1,5 @@
 import { useState, useRef, useMemo, useCallback } from 'react';
-import { DndContext, closestCenter, pointerWithin, PointerSensor, useSensor, useSensors, useDroppable } from '@dnd-kit/core';
+import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
 import { Trash2, ShoppingCart, Star as StarIcon } from 'lucide-react';
 import ItemRow from './ItemRow.jsx';
@@ -7,22 +7,15 @@ import ShopCard from './ShopCard.jsx';
 import EditModal from './EditModal.jsx';
 import './ShoppingList.css';
 
-function DeleteZone({ visible }) {
-  const { isOver, setNodeRef } = useDroppable({ id: 'delete-zone' });
-  return (
-    <div ref={setNodeRef} className={`delete-zone ${visible ? 'visible' : ''} ${isOver ? 'over' : ''}`}>
-      <Trash2 size={24} />
-    </div>
-  );
-}
-
 export default function ShoppingList({ items, setItems, addItem, regulars, toggleRegular, isRegular, shops, setShops }) {
   const [inputVal, setInputVal] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [highlightIdx, setHighlightIdx] = useState(-1);
   const [editingItem, setEditingItem] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [overDelete, setOverDelete] = useState(false);
   const inputRef = useRef(null);
+  const deleteZoneRef = useRef(null);
 
   const total = items.length;
 
@@ -43,23 +36,12 @@ export default function ShoppingList({ items, setItems, addItem, regulars, toggl
     useSensor(PointerSensor, { activationConstraint: { delay: 300, tolerance: 5 } })
   );
 
-  // Use pointerWithin for delete/shop zones (checks if pointer is inside the droppable),
-  // closestCenter for sortable items
-  const collisionDetection = useCallback((args) => {
-    const zoneHit = pointerWithin({
-      ...args,
-      droppableContainers: args.droppableContainers.filter(
-        c => c.id === 'delete-zone' || String(c.id).startsWith('shop-')
-      ),
-    });
-    if (zoneHit.length > 0) return zoneHit;
-    return closestCenter({
-      ...args,
-      droppableContainers: args.droppableContainers.filter(
-        c => c.id !== 'delete-zone' && !String(c.id).startsWith('shop-')
-      ),
-    });
-  }, []);
+  function isPointerOverDelete(pointerX, pointerY) {
+    const el = deleteZoneRef.current;
+    if (!el) return false;
+    const rect = el.getBoundingClientRect();
+    return pointerX >= rect.left && pointerX <= rect.right && pointerY >= rect.top && pointerY <= rect.bottom;
+  }
 
   function handleAdd() {
     addItem(inputVal);
@@ -101,17 +83,32 @@ export default function ShoppingList({ items, setItems, addItem, regulars, toggl
 
   function handleDragStart() {
     setIsDragging(true);
+    setOverDelete(false);
+  }
+
+  function handleDragMove(event) {
+    const { activatorEvent, delta } = event;
+    if (!activatorEvent) return;
+    const x = (activatorEvent.clientX || 0) + (delta?.x || 0);
+    const y = (activatorEvent.clientY || 0) + (delta?.y || 0);
+    setOverDelete(isPointerOverDelete(x, y));
   }
 
   function handleDragEnd(event) {
-    setIsDragging(false);
-    const { active, over } = event;
-    if (!over) return;
+    const { active, over, activatorEvent, delta } = event;
+    const x = (activatorEvent?.clientX || 0) + (delta?.x || 0);
+    const y = (activatorEvent?.clientY || 0) + (delta?.y || 0);
+    const droppedOnDelete = isPointerOverDelete(x, y);
 
-    if (over.id === 'delete-zone') {
+    setIsDragging(false);
+    setOverDelete(false);
+
+    if (droppedOnDelete) {
       setItems(prev => prev.filter(i => i.id !== active.id));
       return;
     }
+
+    if (!over) return;
 
     // Dropped on a shop card
     if (typeof over.id === 'string' && over.id.startsWith('shop-')) {
@@ -137,6 +134,7 @@ export default function ShoppingList({ items, setItems, addItem, regulars, toggl
 
   function handleDragCancel() {
     setIsDragging(false);
+    setOverDelete(false);
   }
 
   function handleCheck(id) {
@@ -222,8 +220,9 @@ export default function ShoppingList({ items, setItems, addItem, regulars, toggl
       ) : (
         <DndContext
           sensors={sensors}
-          collisionDetection={collisionDetection}
+          collisionDetection={closestCenter}
           onDragStart={handleDragStart}
+          onDragMove={handleDragMove}
           onDragEnd={handleDragEnd}
           onDragCancel={handleDragCancel}
         >
@@ -258,7 +257,9 @@ export default function ShoppingList({ items, setItems, addItem, regulars, toggl
             </>
           )}
 
-          <DeleteZone visible={isDragging} />
+          <div ref={deleteZoneRef} className={`delete-zone ${isDragging ? 'visible' : ''} ${overDelete ? 'over' : ''}`}>
+            <Trash2 size={24} />
+          </div>
         </DndContext>
       )}
 

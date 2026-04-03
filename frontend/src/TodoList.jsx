@@ -1,25 +1,18 @@
-import { useState, useRef, useMemo, useCallback } from 'react';
-import { DndContext, closestCenter, pointerWithin, PointerSensor, useSensor, useSensors, useDroppable } from '@dnd-kit/core';
+import { useState, useRef, useMemo } from 'react';
+import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
 import { Trash2, ListChecks, Star as StarIcon } from 'lucide-react';
 import TodoItem from './TodoItem.jsx';
 import './TodoList.css';
-
-function DeleteZone({ visible }) {
-  const { isOver, setNodeRef } = useDroppable({ id: 'delete-zone' });
-  return (
-    <div ref={setNodeRef} className={`delete-zone ${visible ? 'visible' : ''} ${isOver ? 'over' : ''}`}>
-      <Trash2 size={24} />
-    </div>
-  );
-}
 
 export default function TodoList({ todos, setTodos, regulars, toggleRegular, isRegular }) {
   const [inputVal, setInputVal] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [highlightIdx, setHighlightIdx] = useState(-1);
   const [isDragging, setIsDragging] = useState(false);
+  const [overDelete, setOverDelete] = useState(false);
   const inputRef = useRef(null);
+  const deleteZoneRef = useRef(null);
 
   const pending = todos.filter(t => !t.done);
   const completed = todos.filter(t => t.done);
@@ -34,17 +27,12 @@ export default function TodoList({ todos, setTodos, regulars, toggleRegular, isR
     useSensor(PointerSensor, { activationConstraint: { delay: 300, tolerance: 5 } })
   );
 
-  const collisionDetection = useCallback((args) => {
-    const zoneHit = pointerWithin({
-      ...args,
-      droppableContainers: args.droppableContainers.filter(c => c.id === 'delete-zone'),
-    });
-    if (zoneHit.length > 0) return zoneHit;
-    return closestCenter({
-      ...args,
-      droppableContainers: args.droppableContainers.filter(c => c.id !== 'delete-zone'),
-    });
-  }, []);
+  function isPointerOverDelete(pointerX, pointerY) {
+    const el = deleteZoneRef.current;
+    if (!el) return false;
+    const rect = el.getBoundingClientRect();
+    return pointerX >= rect.left && pointerX <= rect.right && pointerY >= rect.top && pointerY <= rect.bottom;
+  }
 
   function addTodo(name) {
     name = (name || inputVal).trim();
@@ -101,16 +89,32 @@ export default function TodoList({ todos, setTodos, regulars, toggleRegular, isR
 
   function handleDragStart() {
     setIsDragging(true);
+    setOverDelete(false);
+  }
+
+  function handleDragMove(event) {
+    const { activatorEvent, delta } = event;
+    if (!activatorEvent) return;
+    const x = (activatorEvent.clientX || 0) + (delta?.x || 0);
+    const y = (activatorEvent.clientY || 0) + (delta?.y || 0);
+    setOverDelete(isPointerOverDelete(x, y));
   }
 
   function handleDragEnd(event) {
+    const { active, over, activatorEvent, delta } = event;
+    const x = (activatorEvent?.clientX || 0) + (delta?.x || 0);
+    const y = (activatorEvent?.clientY || 0) + (delta?.y || 0);
+    const droppedOnDelete = isPointerOverDelete(x, y);
+
     setIsDragging(false);
-    const { active, over } = event;
-    if (!over) return;
-    if (over.id === 'delete-zone') {
+    setOverDelete(false);
+
+    if (droppedOnDelete) {
       setTodos(prev => prev.filter(t => t.id !== active.id));
       return;
     }
+
+    if (!over) return;
     if (active.id !== over.id) {
       setTodos(prev => {
         const oldIndex = prev.findIndex(t => t.id === active.id);
@@ -122,6 +126,7 @@ export default function TodoList({ todos, setTodos, regulars, toggleRegular, isR
 
   function handleDragCancel() {
     setIsDragging(false);
+    setOverDelete(false);
   }
 
   return (
@@ -167,8 +172,9 @@ export default function TodoList({ todos, setTodos, regulars, toggleRegular, isR
       ) : (
         <DndContext
           sensors={sensors}
-          collisionDetection={collisionDetection}
+          collisionDetection={closestCenter}
           onDragStart={handleDragStart}
+          onDragMove={handleDragMove}
           onDragEnd={handleDragEnd}
           onDragCancel={handleDragCancel}
         >
@@ -213,7 +219,9 @@ export default function TodoList({ todos, setTodos, regulars, toggleRegular, isR
             </>
           )}
 
-          <DeleteZone visible={isDragging} />
+          <div ref={deleteZoneRef} className={`delete-zone ${isDragging ? 'visible' : ''} ${overDelete ? 'over' : ''}`}>
+            <Trash2 size={24} />
+          </div>
         </DndContext>
       )}
     </div>
