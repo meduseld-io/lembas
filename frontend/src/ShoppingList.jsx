@@ -34,7 +34,7 @@ export default function ShoppingList({ items, setItems, addItem, regulars, toggl
   }, [inputVal, regulars]);
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { delay: 300, tolerance: 5 } }),
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
     useSensor(TouchSensor, { activationConstraint: { delay: 300, tolerance: 5 } })
   );
 

@@ -26,7 +26,6 @@ export default function ItemRow({ item, onCheck, onQty, onStar, starred, onTap, 
     transition,
     opacity: isDragging ? 0.4 : undefined,
     zIndex: isDragging ? 50 : undefined,
-    touchAction: sortable ? 'manipulation' : undefined,
   };
 
   // Merge our tap detection with dnd-kit's listeners

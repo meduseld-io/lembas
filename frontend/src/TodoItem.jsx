@@ -26,7 +26,6 @@ export default function TodoItem({ item, onToggle, onDelete, onStar, starred, so
     transition,
     opacity: isDragging ? 0.4 : undefined,
     zIndex: isDragging ? 50 : undefined,
-    touchAction: sortable ? 'manipulation' : undefined,
   };
 
   const mergedListeners = sortable && listeners ? {
