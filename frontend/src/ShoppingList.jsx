@@ -16,6 +16,7 @@ export default function ShoppingList({ items, setItems, addItem, regulars, toggl
   const [overDelete, setOverDelete] = useState(false);
   const inputRef = useRef(null);
   const deleteZoneRef = useRef(null);
+  const lastPointer = useRef({ x: 0, y: 0 });
 
   const total = items.length;
 
@@ -36,11 +37,12 @@ export default function ShoppingList({ items, setItems, addItem, regulars, toggl
     useSensor(PointerSensor, { activationConstraint: { delay: 300, tolerance: 5 } })
   );
 
-  function isPointerOverDelete(pointerX, pointerY) {
+  function isPointerOverDelete() {
     const el = deleteZoneRef.current;
     if (!el) return false;
     const rect = el.getBoundingClientRect();
-    return pointerX >= rect.left && pointerX <= rect.right && pointerY >= rect.top && pointerY <= rect.bottom;
+    const { x, y } = lastPointer.current;
+    return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
   }
 
   function handleAdd() {
@@ -84,21 +86,21 @@ export default function ShoppingList({ items, setItems, addItem, regulars, toggl
   function handleDragStart() {
     setIsDragging(true);
     setOverDelete(false);
-  }
-
-  function handleDragMove(event) {
-    const { activatorEvent, delta } = event;
-    if (!activatorEvent) return;
-    const x = (activatorEvent.clientX || 0) + (delta?.x || 0);
-    const y = (activatorEvent.clientY || 0) + (delta?.y || 0);
-    setOverDelete(isPointerOverDelete(x, y));
+    const onPointerMove = (e) => {
+      lastPointer.current = { x: e.clientX, y: e.clientY };
+      setOverDelete(isPointerOverDelete());
+    };
+    const onPointerUp = () => {
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerup', onPointerUp);
+    };
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', onPointerUp);
   }
 
   function handleDragEnd(event) {
-    const { active, over, activatorEvent, delta } = event;
-    const x = (activatorEvent?.clientX || 0) + (delta?.x || 0);
-    const y = (activatorEvent?.clientY || 0) + (delta?.y || 0);
-    const droppedOnDelete = isPointerOverDelete(x, y);
+    const { active, over } = event;
+    const droppedOnDelete = isPointerOverDelete();
 
     setIsDragging(false);
     setOverDelete(false);
@@ -222,7 +224,6 @@ export default function ShoppingList({ items, setItems, addItem, regulars, toggl
           sensors={sensors}
           collisionDetection={closestCenter}
           onDragStart={handleDragStart}
-          onDragMove={handleDragMove}
           onDragEnd={handleDragEnd}
           onDragCancel={handleDragCancel}
         >
