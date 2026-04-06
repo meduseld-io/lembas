@@ -3,6 +3,7 @@ import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from 
 import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
 import { Trash2, ListChecks, Star as StarIcon } from 'lucide-react';
 import TodoItem from './TodoItem.jsx';
+import TodoEditModal from './TodoEditModal.jsx';
 import './TodoList.css';
 
 export default function TodoList({ todos, setTodos, regulars, toggleRegular, isRegular }) {
@@ -11,6 +12,7 @@ export default function TodoList({ todos, setTodos, regulars, toggleRegular, isR
   const [highlightIdx, setHighlightIdx] = useState(-1);
   const [isDragging, setIsDragging] = useState(false);
   const [overDelete, setOverDelete] = useState(false);
+  const [editingTodo, setEditingTodo] = useState(null);
   const inputRef = useRef(null);
   const deleteZoneRef = useRef(null);
   const lastPointer = useRef({ x: 0, y: 0 });
@@ -189,6 +191,7 @@ export default function TodoList({ todos, setTodos, regulars, toggleRegular, isR
                   onDelete={handleDelete}
                   onStar={() => toggleRegular(todo.name)}
                   starred={isRegular(todo.name)}
+                  onTap={() => setEditingTodo(todo)}
                 />
               ))}
             </SortableContext>
@@ -214,6 +217,7 @@ export default function TodoList({ todos, setTodos, regulars, toggleRegular, isR
                   onDelete={handleDelete}
                   onStar={() => toggleRegular(todo.name)}
                   starred={isRegular(todo.name)}
+                  onTap={() => setEditingTodo(todo)}
                   sortable={false}
                 />
               ))}
@@ -224,6 +228,18 @@ export default function TodoList({ todos, setTodos, regulars, toggleRegular, isR
             <Trash2 size={24} />
           </div>
         </DndContext>
+      )}
+
+      {editingTodo && (
+        <TodoEditModal
+          item={editingTodo}
+          onSave={(updated) => {
+            setTodos(prev => prev.map(t => t.id === updated.id ? { ...t, name: updated.name } : t));
+            setEditingTodo(null);
+          }}
+          onClose={() => setEditingTodo(null)}
+          onDelete={() => { handleDelete(editingTodo.id); setEditingTodo(null); }}
+        />
       )}
     </div>
   );

@@ -4,7 +4,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, Star } from 'lucide-react';
 import './TodoItem.css';
 
-export default function TodoItem({ item, onToggle, onDelete, onStar, starred, sortable = true }) {
+export default function TodoItem({ item, onToggle, onDelete, onStar, starred, onTap, sortable = true }) {
   const {
     attributes,
     listeners,
@@ -43,7 +43,7 @@ export default function TodoItem({ item, onToggle, onDelete, onStar, starred, so
         onChange={() => onToggle(item.id)}
         aria-label={`Mark ${item.name} as ${item.done ? 'not done' : 'done'}`}
       />
-      <span className="todo-name">{item.name}</span>
+      <span className="todo-name" onClick={() => onTap && onTap()}>{item.name}</span>
       {onStar && (
         <button
           className={`todo-star-btn ${starred ? 'starred' : ''}`}

@@ -38,6 +38,14 @@ export default function HelpModal({ onClose, mode }) {
             </div>
 
             <div className="help-section">
+              <div className="help-icon"><Pencil size={20} /></div>
+              <div>
+                <p className="help-title">Edit a task</p>
+                <p>Tap on any task to rename it or delete it.</p>
+              </div>
+            </div>
+
+            <div className="help-section">
               <div className="help-icon"><CheckSquare size={20} /></div>
               <div>
                 <p className="help-title">Complete tasks</p>
