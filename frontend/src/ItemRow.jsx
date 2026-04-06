@@ -1,7 +1,7 @@
 import { useRef, useCallback } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Star } from 'lucide-react';
+import { GripVertical, Star } from 'lucide-react';
 import './ItemRow.css';
 
 export default function ItemRow({ item, onCheck, onQty, onStar, starred, onTap, sortable = true }) {
@@ -28,20 +28,10 @@ export default function ItemRow({ item, onCheck, onQty, onStar, starred, onTap, 
     zIndex: isDragging ? 50 : undefined,
   };
 
-  // Merge our tap detection with dnd-kit's listeners
-  const mergedListeners = sortable && listeners ? {
-    ...listeners,
-    onPointerDown: (e) => {
-      touchStart.current = { time: Date.now(), target: e.target };
-      touchMoved.current = false;
-      listeners.onPointerDown?.(e);
-    },
-  } : {
-    onPointerDown: (e) => {
-      touchStart.current = { time: Date.now(), target: e.target };
-      touchMoved.current = false;
-    },
-  };
+  function handlePointerDown(e) {
+    touchStart.current = { time: Date.now(), target: e.target };
+    touchMoved.current = false;
+  }
 
   function handlePointerMove() {
     touchMoved.current = true;
@@ -51,7 +41,7 @@ export default function ItemRow({ item, onCheck, onQty, onStar, starred, onTap, 
     if (!touchMoved.current && touchStart.current && !isDragging) {
       const elapsed = Date.now() - touchStart.current.time;
       const t = touchStart.current.target;
-      const isInteractive = t.type === 'checkbox' || t.closest?.('.qty-controls') || t.closest?.('.item-actions');
+      const isInteractive = t.type === 'checkbox' || t.closest?.('.qty-controls') || t.closest?.('.item-actions') || t.closest?.('.drag-handle');
       if (elapsed < 250 && !isInteractive) {
         onTap();
       }
@@ -65,14 +55,15 @@ export default function ItemRow({ item, onCheck, onQty, onStar, starred, onTap, 
       ref={setRef}
       style={style}
       {...attributes}
-      {...mergedListeners}
+      onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
-      onClick={(e) => {
-        if (e.target.closest('.qty-controls') || e.target.closest('.item-actions') || e.target.type === 'checkbox') return;
-        // Desktop fallback - onPointerUp handles tap on mobile
-      }}
     >
+      {sortable && (
+        <div className="drag-handle" {...listeners} style={{ touchAction: 'none' }}>
+          <GripVertical size={16} />
+        </div>
+      )}
       <input
         type="checkbox"
         checked={item.checked}

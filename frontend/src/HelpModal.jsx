@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Plus, Pencil, ArrowUpDown, Trash2, Star, CheckSquare, ShoppingBag, ListChecks, ShoppingCart } from 'lucide-react';
+import { Plus, Pencil, ArrowUpDown, Trash2, Star, CheckSquare, ShoppingBag, ListChecks, ShoppingCart, GripVertical } from 'lucide-react';
 import './HelpModal.css';
 
 export default function HelpModal({ onClose, mode }) {
@@ -49,7 +49,7 @@ export default function HelpModal({ onClose, mode }) {
               <div className="help-icon"><ArrowUpDown size={20} /></div>
               <div>
                 <p className="help-title">Reorder tasks</p>
-                <p>Press and hold a task to pick it up, then drag it to a new position.</p>
+                <p>Drag the <GripVertical size={14} style={{verticalAlign: 'middle'}} /> grip icon to pick up a task and move it to a new position.</p>
               </div>
             </div>
 
@@ -57,7 +57,7 @@ export default function HelpModal({ onClose, mode }) {
               <div className="help-icon"><Trash2 size={20} /></div>
               <div>
                 <p className="help-title">Delete tasks</p>
-                <p>While dragging, drop the task on the trash icon at the bottom. You can also clear all completed tasks at once.</p>
+                <p>Drag a task using the grip icon and drop it on the trash icon at the bottom. You can also clear all completed tasks at once.</p>
               </div>
             </div>
 
@@ -91,7 +91,7 @@ export default function HelpModal({ onClose, mode }) {
               <div className="help-icon"><ArrowUpDown size={20} /></div>
               <div>
                 <p className="help-title">Reorder items</p>
-                <p>Press and hold an item to pick it up, then drag it to a new position.</p>
+                <p>Drag the <GripVertical size={14} style={{verticalAlign: 'middle'}} /> grip icon to pick up an item and move it to a new position.</p>
               </div>
             </div>
 
@@ -99,7 +99,7 @@ export default function HelpModal({ onClose, mode }) {
               <div className="help-icon"><Trash2 size={20} /></div>
               <div>
                 <p className="help-title">Delete an item</p>
-                <p>While dragging, drop the item on the trash icon at the bottom. You can also delete from the edit screen.</p>
+                <p>Drag an item using the grip icon and drop it on the trash icon at the bottom. You can also delete from the edit screen.</p>
               </div>
             </div>
 

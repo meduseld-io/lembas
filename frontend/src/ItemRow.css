@@ -24,6 +24,25 @@
   border-color: var(--green-500);
 }
 
+.drag-handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  cursor: grab;
+  padding: 4px 0;
+  flex-shrink: 0;
+  opacity: 0.5;
+  transition: opacity 0.15s, color 0.15s;
+}
+.drag-handle:hover {
+  opacity: 1;
+  color: var(--text-secondary);
+}
+.drag-handle:active {
+  cursor: grabbing;
+}
+
 .item input[type='checkbox'] {
   width: 20px;
   height: 20px;

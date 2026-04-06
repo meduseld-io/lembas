@@ -1,13 +1,10 @@
-import { useRef, useCallback } from 'react';
+import { useCallback } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Star } from 'lucide-react';
+import { GripVertical, Star } from 'lucide-react';
 import './TodoItem.css';
 
 export default function TodoItem({ item, onToggle, onDelete, onStar, starred, sortable = true }) {
-  const touchStart = useRef(null);
-  const touchMoved = useRef(false);
-
   const {
     attributes,
     listeners,
@@ -28,23 +25,18 @@ export default function TodoItem({ item, onToggle, onDelete, onStar, starred, so
     zIndex: isDragging ? 50 : undefined,
   };
 
-  const mergedListeners = sortable && listeners ? {
-    ...listeners,
-    onPointerDown: (e) => {
-      touchStart.current = { time: Date.now() };
-      touchMoved.current = false;
-      listeners.onPointerDown?.(e);
-    },
-  } : {};
-
   return (
     <div
       className={`todo-item ${item.done ? 'done' : ''} ${isDragging ? 'dragging' : ''}`}
       ref={setRef}
       style={style}
       {...attributes}
-      {...mergedListeners}
     >
+      {sortable && (
+        <div className="drag-handle" {...listeners} style={{ touchAction: 'none' }}>
+          <GripVertical size={16} />
+        </div>
+      )}
       <input
         type="checkbox"
         checked={item.done}

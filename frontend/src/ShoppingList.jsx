@@ -1,5 +1,5 @@
 import { useState, useRef, useMemo, useCallback } from 'react';
-import { DndContext, closestCenter, PointerSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
 import { Trash2, ShoppingCart, Star as StarIcon } from 'lucide-react';
 import ItemRow from './ItemRow.jsx';
@@ -34,8 +34,7 @@ export default function ShoppingList({ items, setItems, addItem, regulars, toggl
   }, [inputVal, regulars]);
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 300, tolerance: 5 } })
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
   );
 
   function isPointerOverDelete() {
