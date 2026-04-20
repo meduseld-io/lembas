@@ -26,6 +26,7 @@ export default function ItemRow({ item, onCheck, onQty, onStar, starred, onTap, 
     transition,
     opacity: isDragging ? 0.4 : undefined,
     zIndex: isDragging ? 50 : undefined,
+    touchAction: 'manipulation',
   };
 
   function handlePointerDown(e) {

@@ -23,6 +23,7 @@ export default function TodoItem({ item, onToggle, onDelete, onStar, starred, on
     transition,
     opacity: isDragging ? 0.4 : undefined,
     zIndex: isDragging ? 50 : undefined,
+    touchAction: 'manipulation',
   };
 
   return (

@@ -1,5 +1,5 @@
 import { useState, useRef, useMemo } from 'react';
-import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { DndContext, closestCenter, MouseSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
 import { Trash2, ListChecks, Star as StarIcon } from 'lucide-react';
 import TodoItem from './TodoItem.jsx';
@@ -27,7 +27,8 @@ export default function TodoList({ todos, setTodos, regulars, toggleRegular, isR
   }, [inputVal, regulars]);
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
+    useSensor(MouseSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 5 } })
   );
 
   function isPointerOverDelete() {
