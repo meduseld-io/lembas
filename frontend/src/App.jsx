@@ -23,6 +23,22 @@ export default function App() {
   const activeList = lists.find(l => l.id === activeListId) || lists[0];
   const activeItems = activeList?.items || [];
 
+  // Per-mode regulars: shopping uses top-level regulars, lists mode uses per-list regulars
+  const activeRegulars = mode === 'lists' ? (activeList?.regulars || []) : regulars;
+
+  const setActiveRegulars = useCallback((updater) => {
+    if (mode === 'lists') {
+      setLists(prev => prev.map(l => {
+        if (l.id !== activeListId) return l;
+        const regs = l.regulars || [];
+        const next = typeof updater === 'function' ? updater(regs) : updater;
+        return { ...l, regulars: next };
+      }));
+    } else {
+      setRegulars(updater);
+    }
+  }, [mode, activeListId, setLists, setRegulars]);
+
   const setActiveItems = useCallback((updater) => {
     setLists(prev => prev.map(l => {
       if (l.id !== activeListId) return l;
@@ -55,23 +71,23 @@ export default function App() {
   }, [setActiveItems]);
 
   const toggleRegular = useCallback((name) => {
-    setRegulars(prev => {
+    setActiveRegulars(prev => {
       const idx = prev.findIndex(r => r.toLowerCase() === name.toLowerCase());
       if (idx >= 0) return prev.filter((_, i) => i !== idx);
       return [...prev, name];
     });
-  }, [setRegulars]);
+  }, [setActiveRegulars]);
 
   const isRegular = useCallback((name) => {
-    return regulars.some(r => r.toLowerCase() === name.toLowerCase());
-  }, [regulars]);
+    return activeRegulars.some(r => r.toLowerCase() === name.toLowerCase());
+  }, [activeRegulars]);
 
   function handleAddList(e) {
     e.preventDefault();
     const name = newListName.trim();
     if (!name) return;
     const id = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') + '-' + Date.now();
-    setLists(prev => [...prev, { id, name, items: [] }]);
+    setLists(prev => [...prev, { id, name, items: [], regulars: [] }]);
     setActiveListId(id);
     setNewListName('');
     setShowAddList(false);
@@ -212,8 +228,8 @@ export default function App() {
       <main className="app-main" onClick={() => showListPicker && setShowListPicker(false)}>
         {tab === 'regulars' ? (
           <RegularsGrid
-            regulars={regulars}
-            setRegulars={setRegulars}
+            regulars={activeRegulars}
+            setRegulars={setActiveRegulars}
             items={mode === 'lists' ? activeItems.filter(t => !t.done) : items}
             addItem={mode === 'lists' ? addListItem : addItem}
             mode={mode}
@@ -222,7 +238,7 @@ export default function App() {
           <TodoList
             todos={activeItems}
             setTodos={setActiveItems}
-            regulars={regulars}
+            regulars={activeRegulars}
             toggleRegular={toggleRegular}
             isRegular={isRegular}
           />
@@ -231,7 +247,7 @@ export default function App() {
             items={items}
             setItems={setItems}
             addItem={addItem}
-            regulars={regulars}
+            regulars={activeRegulars}
             toggleRegular={toggleRegular}
             isRegular={isRegular}
             shops={shops}

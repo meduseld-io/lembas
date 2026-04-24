@@ -39,10 +39,13 @@ function loadMode() {
 
 function loadLists() {
   const lists = load(LISTS_KEY, null);
-  if (lists && lists.length) return lists;
+  if (lists && lists.length) {
+    // Ensure each list has a regulars array
+    return lists.map(l => ({ ...l, regulars: l.regulars || [] }));
+  }
   // Migrate old todos into the default Tasks list
   const oldTodos = load('lembas_todos', []);
-  const defaultLists = DEFAULT_LISTS.map(l => ({ ...l }));
+  const defaultLists = DEFAULT_LISTS.map(l => ({ ...l, regulars: [] }));
   if (oldTodos.length) {
     defaultLists[0].items = oldTodos;
   }
