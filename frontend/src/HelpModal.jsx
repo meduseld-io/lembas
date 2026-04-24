@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Plus, Pencil, ArrowUpDown, Trash2, Star, CheckSquare, ShoppingBag, ListChecks, ShoppingCart, GripVertical } from 'lucide-react';
+import { Plus, Pencil, ArrowUpDown, Trash2, Star, CheckSquare, ShoppingBag, LayoutList, ShoppingCart, GripVertical } from 'lucide-react';
 import './HelpModal.css';
 
 export default function HelpModal({ onClose, mode }) {
@@ -23,57 +23,65 @@ export default function HelpModal({ onClose, mode }) {
           <div className="help-icon"><ShoppingCart size={20} /></div>
           <div>
             <p className="help-title">Modes</p>
-            <p>Switch between To-Do and Shopping modes using the icons in the header. Your data is saved separately for each mode.</p>
+            <p>Switch between Shopping and Lists modes using the icons in the header. Shopping mode tracks items with prices and quantities. Lists mode lets you create custom checklists.</p>
           </div>
         </div>
 
-        {mode === 'todo' ? (
+        {mode === 'lists' ? (
           <>
+            <div className="help-section">
+              <div className="help-icon"><LayoutList size={20} /></div>
+              <div>
+                <p className="help-title">Custom lists</p>
+                <p>Create multiple lists for different purposes - tasks, packing, errands, places to visit, and more. Tap the list name at the top to switch between them or add new ones.</p>
+              </div>
+            </div>
+
             <div className="help-section">
               <div className="help-icon"><Plus size={20} /></div>
               <div>
-                <p className="help-title">Add tasks</p>
-                <p>Type a task name and tap Add to create it.</p>
+                <p className="help-title">Add items</p>
+                <p>Type a name and tap Add to create it.</p>
               </div>
             </div>
 
             <div className="help-section">
               <div className="help-icon"><Pencil size={20} /></div>
               <div>
-                <p className="help-title">Edit a task</p>
-                <p>Tap on any task to rename it or delete it.</p>
+                <p className="help-title">Edit an item</p>
+                <p>Tap on any item to rename it or delete it.</p>
               </div>
             </div>
 
             <div className="help-section">
               <div className="help-icon"><CheckSquare size={20} /></div>
               <div>
-                <p className="help-title">Complete tasks</p>
-                <p>Tap the checkbox to mark a task as done. Completed tasks move to the bottom of the list.</p>
+                <p className="help-title">Complete items</p>
+                <p>Tap the checkbox to mark an item as done. Completed items move to the bottom of the list.</p>
               </div>
             </div>
 
             <div className="help-section">
               <div className="help-icon"><ArrowUpDown size={20} /></div>
               <div>
-                <p className="help-title">Reorder tasks</p>
-                <p>Drag the <GripVertical size={14} style={{verticalAlign: 'middle'}} /> grip icon to pick up a task and move it to a new position.</p>
+                <p className="help-title">Reorder items</p>
+                <p>Drag the <GripVertical size={14} style={{verticalAlign: 'middle'}} /> grip icon to pick up an item and move it to a new position.</p>
               </div>
             </div>
 
             <div className="help-section">
               <div className="help-icon"><Trash2 size={20} /></div>
               <div>
-                <p className="help-title">Delete tasks</p>
-                <p>Drag a task using the grip icon and drop it on the trash icon at the bottom. You can also clear all completed tasks at once.</p>
+                <p className="help-title">Delete items</p>
+                <p>Drag an item using the grip icon and drop it on the trash icon at the bottom. You can also clear all completed items at once.</p>
               </div>
             </div>
 
             <div className="help-section">
               <div className="help-icon"><Star size={20} /></div>
               <div>
-                <p className="help-title">Regular tasks</p>
-                <p>Tap the star on any task to save it as a regular. Switch to the Regulars tab to quickly re-add saved tasks.</p>
+                <p className="help-title">Regular items</p>
+                <p>Tap the star on any item to save it as a regular. Switch to the Regulars tab to quickly re-add saved items.</p>
               </div>
             </div>
           </>

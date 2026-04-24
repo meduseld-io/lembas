@@ -85,6 +85,163 @@
   color: #fff;
 }
 
+/* List picker bar (Lists mode) */
+.list-picker-bar {
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  padding: 8px 16px;
+  position: sticky;
+  top: calc(60px + env(safe-area-inset-top, 0));
+  z-index: 95;
+}
+.list-picker-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 14px;
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+  transition: border-color 0.15s;
+}
+.list-picker-toggle:hover { border-color: var(--green-600); }
+.list-picker-toggle span { flex: 1; text-align: left; }
+.list-picker-toggle .chevron-open { transform: rotate(180deg); }
+.list-picker-toggle svg { transition: transform 0.15s; color: var(--text-muted); }
+
+.list-picker-dropdown {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin-top: 6px;
+  max-width: 560px;
+  margin-left: auto;
+  margin-right: auto;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  animation: fadeIn 0.1s ease;
+}
+.list-picker-item {
+  display: flex;
+  align-items: center;
+  padding: 0 4px 0 0;
+  border-bottom: 1px solid var(--border);
+}
+.list-picker-item:last-of-type { border-bottom: none; }
+.list-picker-item.active .list-picker-name { color: var(--green-500); }
+.list-picker-name {
+  flex: 1;
+  padding: 11px 14px;
+  font-size: 0.88rem;
+  color: var(--text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.list-picker-name:hover { color: var(--green-500); }
+.list-count {
+  font-size: 0.7rem;
+  font-weight: 600;
+  background: var(--green-100);
+  color: var(--green-500);
+  padding: 1px 7px;
+  border-radius: var(--radius-full);
+}
+.list-picker-actions {
+  display: flex;
+  gap: 2px;
+  flex-shrink: 0;
+}
+.list-picker-actions button {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  transition: color 0.15s, background 0.15s;
+}
+.list-picker-actions button:hover { color: var(--text); background: var(--bg-card); }
+.list-picker-actions button:last-child:hover { color: var(--red-500); }
+
+.list-rename-form {
+  flex: 1;
+  padding: 4px 8px;
+}
+.list-rename-form input {
+  width: 100%;
+  padding: 6px 10px;
+  border: 2px solid var(--green-600);
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 0.88rem;
+  color: var(--text);
+  background: var(--bg-card);
+  outline: none;
+}
+
+.list-add-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 11px 14px;
+  background: none;
+  border: none;
+  border-top: 1px solid var(--border);
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--green-500);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.list-add-btn:hover { background: var(--green-50); }
+
+.list-add-form {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 10px;
+  border-top: 1px solid var(--border);
+}
+.list-add-form input {
+  flex: 1;
+  padding: 7px 10px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 0.88rem;
+  color: var(--text);
+  background: var(--bg-card);
+  outline: none;
+}
+.list-add-form input:focus { border-color: var(--green-600); }
+.list-add-form button {
+  background: none;
+  border: none;
+  color: var(--green-500);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  transition: background 0.15s;
+}
+.list-add-form button:hover { background: var(--bg-card); }
+.list-add-form button:last-child { color: var(--text-muted); }
+
 .tabs {
   display: flex;
   background: var(--bg-card);
@@ -92,6 +249,9 @@
   position: sticky;
   top: calc(60px + env(safe-area-inset-top, 0));
   z-index: 90;
+}
+.tabs.with-picker {
+  top: calc(104px + env(safe-area-inset-top, 0));
 }
 .tab {
   flex: 1;

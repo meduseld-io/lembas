@@ -13,7 +13,7 @@ export default function RegularsGrid({ regulars, setRegulars, items, addItem, mo
     setRegulars(prev => prev.filter(r => r.toLowerCase() !== name.toLowerCase()));
   }
 
-  const listLabel = mode === 'todo' ? 'task list' : 'shopping list';
+  const listLabel = mode === 'lists' ? 'list' : 'shopping list';
 
   if (!regulars.length) {
     return (
