@@ -44,8 +44,9 @@
 }
 
 .item input[type='checkbox'] {
-  width: 20px;
-  height: 20px;
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
   accent-color: var(--green-600);
   cursor: pointer;
   flex-shrink: 0;
@@ -92,14 +93,14 @@
   flex-shrink: 0;
 }
 .qty-btn {
-  width: 26px;
-  height: 26px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   border: none;
   background: var(--bg-card);
   cursor: pointer;
   font-family: inherit;
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   font-weight: 600;
   color: var(--text-secondary);
   display: flex;
@@ -124,7 +125,7 @@
   border: none;
   cursor: pointer;
   font-size: 1.05rem;
-  padding: 6px;
+  padding: 10px;
   border-radius: var(--radius-sm);
   line-height: 1;
   transition: background 0.1s, transform 0.1s;

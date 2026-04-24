@@ -26,7 +26,6 @@ export default function ItemRow({ item, onCheck, onQty, onStar, starred, onTap, 
     transition,
     opacity: isDragging ? 0.4 : undefined,
     zIndex: isDragging ? 50 : undefined,
-    touchAction: 'manipulation',
   };
 
   function handlePointerDown(e) {
@@ -88,7 +87,7 @@ export default function ItemRow({ item, onCheck, onQty, onStar, starred, onTap, 
           className={`item-btn star-btn ${starred ? 'starred' : ''}`}
           onClick={(e) => { e.stopPropagation(); onStar(); }}
           aria-label={starred ? 'Remove from regulars' : 'Add to regulars'}
-        ><Star size={18} fill={starred ? 'currentColor' : 'none'} /></button>
+        ><Star size={20} fill={starred ? 'currentColor' : 'none'} /></button>
       </div>
     </div>
   );

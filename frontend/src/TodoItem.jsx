@@ -23,7 +23,6 @@ export default function TodoItem({ item, onToggle, onDelete, onStar, starred, on
     transition,
     opacity: isDragging ? 0.4 : undefined,
     zIndex: isDragging ? 50 : undefined,
-    touchAction: 'manipulation',
   };
 
   return (
@@ -51,7 +50,7 @@ export default function TodoItem({ item, onToggle, onDelete, onStar, starred, on
           onClick={(e) => { e.stopPropagation(); onStar(); }}
           aria-label={starred ? 'Remove from regulars' : 'Add to regulars'}
         >
-          <Star size={16} fill={starred ? 'currentColor' : 'none'} />
+          <Star size={18} fill={starred ? 'currentColor' : 'none'} />
         </button>
       )}
     </div>

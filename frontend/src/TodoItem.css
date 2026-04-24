@@ -41,8 +41,9 @@
 }
 
 .todo-item input[type="checkbox"] {
-  width: 20px;
-  height: 20px;
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
   accent-color: var(--green-500);
   cursor: pointer;
   flex-shrink: 0;
@@ -62,7 +63,7 @@
   border: none;
   color: var(--text-muted);
   cursor: pointer;
-  padding: 4px;
+  padding: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
