@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import './EditModal.css';
 
-export default function TodoEditModal({ item, onSave, onClose, onDelete }) {
+export default function TodoEditModal({ item, onSave, onClose, onDelete, lists, currentListId, onMove }) {
   const [name, setName] = useState(item.name);
 
   useEffect(() => {
@@ -18,6 +18,9 @@ export default function TodoEditModal({ item, onSave, onClose, onDelete }) {
     onSave({ id: item.id, name: name.trim() });
   }
 
+  // Other lists this item can be moved to
+  const otherLists = lists ? lists.filter(l => l.id !== currentListId) : [];
+
   return (
     <div className="modal-overlay" onClick={onClose} role="dialog" aria-modal="true" aria-label="Edit task">
       <div className="modal-content" onClick={e => e.stopPropagation()}>
@@ -33,6 +36,23 @@ export default function TodoEditModal({ item, onSave, onClose, onDelete }) {
               required
             />
           </div>
+          {otherLists.length > 0 && (
+            <div className="field">
+              <label htmlFor="edit-todo-move">Move to list</label>
+              <select
+                id="edit-todo-move"
+                defaultValue=""
+                onChange={e => {
+                  if (e.target.value) onMove(item.id, e.target.value);
+                }}
+              >
+                <option value="" disabled>Select a list...</option>
+                {otherLists.map(l => (
+                  <option key={l.id} value={l.id}>{l.name}</option>
+                ))}
+              </select>
+            </div>
+          )}
           <div className="modal-actions">
             <button type="button" className="btn-delete" onClick={onDelete}>Delete</button>
             <div className="modal-actions-right">

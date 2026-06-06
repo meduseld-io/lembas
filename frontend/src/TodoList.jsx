@@ -6,7 +6,7 @@ import TodoItem from './TodoItem.jsx';
 import TodoEditModal from './TodoEditModal.jsx';
 import './TodoList.css';
 
-export default function TodoList({ todos, setTodos, regulars, toggleRegular, isRegular }) {
+export default function TodoList({ todos, setTodos, regulars, toggleRegular, isRegular, lists, activeListId, onMoveItem }) {
   const [inputVal, setInputVal] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [highlightIdx, setHighlightIdx] = useState(-1);
@@ -90,6 +90,10 @@ export default function TodoList({ todos, setTodos, regulars, toggleRegular, isR
 
   function handleClearCompleted() {
     setTodos(prev => prev.filter(t => !t.done));
+  }
+
+  function handleClearAll() {
+    setTodos([]);
   }
 
   function handleDragStart() {
@@ -222,6 +226,9 @@ export default function TodoList({ todos, setTodos, regulars, toggleRegular, isR
                   sortable={false}
                 />
               ))}
+              <button className="clear-all-btn" onClick={handleClearAll}>
+                Clear entire list
+              </button>
             </>
           )}
 
@@ -234,6 +241,12 @@ export default function TodoList({ todos, setTodos, regulars, toggleRegular, isR
       {editingTodo && (
         <TodoEditModal
           item={editingTodo}
+          lists={lists}
+          currentListId={activeListId}
+          onMove={(itemId, targetListId) => {
+            if (onMoveItem) onMoveItem(itemId, targetListId);
+            setEditingTodo(null);
+          }}
           onSave={(updated) => {
             setTodos(prev => prev.map(t => t.id === updated.id ? { ...t, name: updated.name } : t));
             setEditingTodo(null);

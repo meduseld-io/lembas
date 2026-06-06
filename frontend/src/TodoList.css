@@ -20,3 +20,22 @@
   color: var(--red-500);
   border-color: var(--red-500);
 }
+
+.clear-all-btn {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  padding: 11px;
+  background: none;
+  border: 1.5px solid var(--red-500);
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--red-500);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.clear-all-btn:hover {
+  background: var(--red-50);
+}

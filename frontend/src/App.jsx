@@ -225,6 +225,18 @@ export default function App() {
             regulars={activeRegulars}
             toggleRegular={toggleRegular}
             isRegular={isRegular}
+            lists={lists}
+            activeListId={activeListId}
+            onMoveItem={(itemId, targetListId) => {
+              // Remove from current list and add to target list
+              const item = activeItems.find(t => t.id === itemId);
+              if (!item) return;
+              setActiveItems(prev => prev.filter(t => t.id !== itemId));
+              setLists(prev => prev.map(l => {
+                if (l.id !== targetListId) return l;
+                return { ...l, items: [...(l.items || []), { ...item, done: false }] };
+              }));
+            }}
           />
         ) : tab === 'regulars' ? (
           <RegularsGrid
