@@ -250,9 +250,6 @@
   top: calc(60px + env(safe-area-inset-top, 0));
   z-index: 90;
 }
-.tabs.with-picker {
-  top: calc(104px + env(safe-area-inset-top, 0));
-}
 .tab {
   flex: 1;
   padding: 13px 12px;

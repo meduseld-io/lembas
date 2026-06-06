@@ -7,6 +7,8 @@ import TodoList from './TodoList.jsx';
 import HelpModal from './HelpModal.jsx';
 import './App.css';
 
+// Lists mode has no tabs — the list picker dropdown is the only navigation.
+
 export default function App() {
   const {
     items, setItems, regulars, setRegulars, shops, setShops,
@@ -23,7 +25,7 @@ export default function App() {
   const activeList = lists.find(l => l.id === activeListId) || lists[0];
   const activeItems = activeList?.items || [];
 
-  // Per-mode regulars: shopping uses top-level regulars, lists mode uses per-list regulars
+  // Per-mode regulars: shopping uses top-level regulars, each list has its own
   const activeRegulars = mode === 'lists' ? (activeList?.regulars || []) : regulars;
 
   const setActiveRegulars = useCallback((updater) => {
@@ -42,8 +44,8 @@ export default function App() {
   const setActiveItems = useCallback((updater) => {
     setLists(prev => prev.map(l => {
       if (l.id !== activeListId) return l;
-      const items = l.items || [];
-      const next = typeof updater === 'function' ? updater(items) : updater;
+      const current = l.items || [];
+      const next = typeof updater === 'function' ? updater(current) : updater;
       return { ...l, items: next };
     }));
   }, [setLists, activeListId]);
@@ -59,16 +61,6 @@ export default function App() {
       return [...prev, { id: Date.now(), name, qty, checked: false, price: '', aisle: '' }];
     });
   }, [setItems]);
-
-  const addListItem = useCallback((name) => {
-    name = name.trim();
-    if (!name) return;
-    setActiveItems(prev => {
-      const existing = prev.find(t => t.name.toLowerCase() === name.toLowerCase() && !t.done);
-      if (existing) return prev;
-      return [...prev, { id: Date.now(), name, done: false }];
-    });
-  }, [setActiveItems]);
 
   const toggleRegular = useCallback((name) => {
     setActiveRegulars(prev => {
@@ -116,8 +108,6 @@ export default function App() {
     setEditingListId(l.id);
     setEditListName(l.name);
   }
-
-  const listTabLabel = mode === 'lists' ? activeList?.name || 'List' : 'Shopping List';
 
   return (
     <div className="app-shell">
@@ -206,41 +196,43 @@ export default function App() {
         </div>
       )}
 
-      <div className={`tabs ${mode === 'lists' ? 'with-picker' : ''}`} role="tablist">
-        <button
-          className={`tab ${tab === 'list' ? 'active' : ''}`}
-          role="tab"
-          aria-selected={tab === 'list'}
-          onClick={() => setTab('list')}
-        >
-          {listTabLabel}
-        </button>
-        <button
-          className={`tab ${tab === 'regulars' ? 'active' : ''}`}
-          role="tab"
-          aria-selected={tab === 'regulars'}
-          onClick={() => setTab('regulars')}
-        >
-          Regulars
-        </button>
-      </div>
+      {mode === 'shopping' && (
+        <div className="tabs" role="tablist">
+          <button
+            className={`tab ${tab === 'list' ? 'active' : ''}`}
+            role="tab"
+            aria-selected={tab === 'list'}
+            onClick={() => setTab('list')}
+          >
+            Shopping List
+          </button>
+          <button
+            className={`tab ${tab === 'regulars' ? 'active' : ''}`}
+            role="tab"
+            aria-selected={tab === 'regulars'}
+            onClick={() => setTab('regulars')}
+          >
+            Regulars
+          </button>
+        </div>
+      )}
 
       <main className="app-main" onClick={() => showListPicker && setShowListPicker(false)}>
-        {tab === 'regulars' ? (
-          <RegularsGrid
-            regulars={activeRegulars}
-            setRegulars={setActiveRegulars}
-            items={mode === 'lists' ? activeItems.filter(t => !t.done) : items}
-            addItem={mode === 'lists' ? addListItem : addItem}
-            mode={mode}
-          />
-        ) : mode === 'lists' ? (
+        {mode === 'lists' ? (
           <TodoList
             todos={activeItems}
             setTodos={setActiveItems}
             regulars={activeRegulars}
             toggleRegular={toggleRegular}
             isRegular={isRegular}
+          />
+        ) : tab === 'regulars' ? (
+          <RegularsGrid
+            regulars={activeRegulars}
+            setRegulars={setActiveRegulars}
+            items={items}
+            addItem={addItem}
+            mode={mode}
           />
         ) : (
           <ShoppingList
