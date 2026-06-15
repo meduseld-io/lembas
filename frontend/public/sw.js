@@ -1,7 +1,5 @@
-const CACHE_NAME = 'lembas-v7';
+const CACHE_NAME = 'lembas-v8';
 
-// On install, cache everything the browser has already requested
-// (the precache list approach fails because hashed asset names change each build)
 self.addEventListener('install', (e) => {
   e.waitUntil(
     caches.open(CACHE_NAME).then((cache) =>
@@ -30,38 +28,43 @@ self.addEventListener('activate', (e) => {
 });
 
 self.addEventListener('fetch', (e) => {
-  // Only handle GET requests for same-origin or cdn assets
   if (e.request.method !== 'GET') return;
 
   const url = new URL(e.request.url);
 
-  // For navigation requests (HTML pages), use cache-first with network fallback
+  // Only handle same-origin requests
+  if (url.origin !== self.location.origin) return;
+
+  // Navigation requests (HTML pages): network-first, fall back to cached index.html.
+  // Do NOT respond with a redirect - Safari rejects opaque redirects from service workers.
   if (e.request.mode === 'navigate') {
     e.respondWith(
-      caches.match('/index.html').then((cached) => {
-        if (cached) return cached;
-        return fetch(e.request).then((res) => {
+      fetch(e.request).then((res) => {
+        // Only cache successful, non-redirected responses
+        if (res.ok && res.type === 'basic') {
           const clone = res.clone();
-          caches.open(CACHE_NAME).then((c) => c.put(e.request, clone));
-          return res;
-        });
+          caches.open(CACHE_NAME).then((c) => c.put('/index.html', clone));
+        }
+        return res;
+      }).catch(() => {
+        // Offline fallback: serve cached index.html
+        return caches.match('/index.html');
       })
     );
     return;
   }
 
-  // For JS/CSS/image assets: cache-first, update in background
+  // Assets: cache-first, update in background
   e.respondWith(
     caches.match(e.request).then((cached) => {
       const networkFetch = fetch(e.request).then((res) => {
-        if (res.ok) {
+        if (res.ok && res.type === 'basic') {
           const clone = res.clone();
           caches.open(CACHE_NAME).then((c) => c.put(e.request, clone));
         }
         return res;
-      });
+      }).catch(() => cached);
 
-      // Return cached immediately if available, otherwise wait for network
       return cached || networkFetch;
     })
   );
