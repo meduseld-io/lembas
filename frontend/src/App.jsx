@@ -140,6 +140,8 @@ export default function App() {
             <ChevronDown size={14} className={showListPicker ? 'chevron-open' : ''} />
           </button>
           {showListPicker && (
+            <>
+            <div className="list-picker-backdrop" onClick={() => setShowListPicker(false)} />
             <div className="list-picker-dropdown">
               {lists.map(l => (
                 <div key={l.id} className={`list-picker-item ${l.id === activeListId ? 'active' : ''}`}>
@@ -192,6 +194,7 @@ export default function App() {
                 </button>
               )}
             </div>
+            </>
           )}
         </div>
       )}
@@ -217,7 +220,7 @@ export default function App() {
         </div>
       )}
 
-      <main className="app-main" onClick={() => showListPicker && setShowListPicker(false)}>
+      <main className="app-main">
         {mode === 'lists' ? (
           <TodoList
             todos={activeItems}
