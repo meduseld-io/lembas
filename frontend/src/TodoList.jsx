@@ -1,7 +1,7 @@
 import { useState, useRef, useMemo } from 'react';
-import { DndContext, closestCenter, MouseSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { DndContext, closestCenter, DragOverlay, MouseSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
-import { Trash2, ListChecks, Star as StarIcon } from 'lucide-react';
+import { Trash2, ListChecks, Star as StarIcon, GripVertical } from 'lucide-react';
 import TodoItem from './TodoItem.jsx';
 import TodoEditModal from './TodoEditModal.jsx';
 import './TodoList.css';
@@ -12,6 +12,7 @@ export default function TodoList({ todos, setTodos, regulars, toggleRegular, isR
   const [highlightIdx, setHighlightIdx] = useState(-1);
   const [isDragging, setIsDragging] = useState(false);
   const [overDelete, setOverDelete] = useState(false);
+  const [activeId, setActiveId] = useState(null);
   const [editingTodo, setEditingTodo] = useState(null);
   const inputRef = useRef(null);
   const deleteZoneRef = useRef(null);
@@ -96,7 +97,8 @@ export default function TodoList({ todos, setTodos, regulars, toggleRegular, isR
     setTodos([]);
   }
 
-  function handleDragStart() {
+  function handleDragStart(event) {
+    setActiveId(event.active.id);
     setIsDragging(true);
     setOverDelete(false);
     const onPointerMove = (e) => {
@@ -117,6 +119,7 @@ export default function TodoList({ todos, setTodos, regulars, toggleRegular, isR
 
     setIsDragging(false);
     setOverDelete(false);
+    setActiveId(null);
 
     if (droppedOnDelete) {
       setTodos(prev => prev.filter(t => t.id !== active.id));
@@ -136,6 +139,7 @@ export default function TodoList({ todos, setTodos, regulars, toggleRegular, isR
   function handleDragCancel() {
     setIsDragging(false);
     setOverDelete(false);
+    setActiveId(null);
   }
 
   return (
@@ -235,6 +239,20 @@ export default function TodoList({ todos, setTodos, regulars, toggleRegular, isR
           <div ref={deleteZoneRef} className={`delete-zone ${isDragging ? 'visible' : ''} ${overDelete ? 'over' : ''}`}>
             <Trash2 size={24} />
           </div>
+
+          <DragOverlay dropAnimation={null}>
+            {activeId ? (() => {
+              const item = todos.find(t => t.id === activeId);
+              if (!item) return null;
+              return (
+                <div className="todo-item drag-overlay-item">
+                  <div className="drag-handle"><GripVertical size={16} /></div>
+                  <input type="checkbox" checked={item.done} readOnly />
+                  <span className="todo-name">{item.name}</span>
+                </div>
+              );
+            })() : null}
+          </DragOverlay>
         </DndContext>
       )}
 

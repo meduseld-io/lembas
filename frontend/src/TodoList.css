@@ -39,3 +39,10 @@
 .clear-all-btn:hover {
   background: var(--red-50);
 }
+
+
+.drag-overlay-item {
+  box-shadow: var(--shadow-lg);
+  opacity: 1 !important;
+  cursor: grabbing;
+}
