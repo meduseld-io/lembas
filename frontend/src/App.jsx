@@ -117,14 +117,14 @@ export default function App() {
         <div className="mode-switcher">
           <button
             className={`mode-btn ${mode === 'shopping' ? 'active' : ''}`}
-            onClick={() => { setMode('shopping'); setTab('list'); setShowListPicker(false); }}
+            onClick={() => { setMode(mode === 'shopping' ? 'lists' : 'shopping'); setTab('list'); setShowListPicker(false); }}
             aria-label="Shopping mode"
           >
             <ShoppingCart size={16} />
           </button>
           <button
             className={`mode-btn ${mode === 'lists' ? 'active' : ''}`}
-            onClick={() => { setMode('lists'); setTab('list'); }}
+            onClick={() => { setMode(mode === 'lists' ? 'shopping' : 'lists'); setTab('list'); setShowListPicker(false); }}
             aria-label="Lists mode"
           >
             <LayoutList size={16} />
