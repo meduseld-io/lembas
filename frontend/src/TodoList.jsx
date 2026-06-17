@@ -101,6 +101,7 @@ export default function TodoList({ todos, setTodos, regulars, toggleRegular, isR
     setActiveId(event.active.id);
     setIsDragging(true);
     setOverDelete(false);
+    document.body.style.overflow = 'hidden';
     const onPointerMove = (e) => {
       lastPointer.current = { x: e.clientX, y: e.clientY };
       setOverDelete(isPointerOverDelete());
@@ -120,6 +121,7 @@ export default function TodoList({ todos, setTodos, regulars, toggleRegular, isR
     setIsDragging(false);
     setOverDelete(false);
     setActiveId(null);
+    document.body.style.overflow = '';
 
     if (droppedOnDelete) {
       setTodos(prev => prev.filter(t => t.id !== active.id));
@@ -140,6 +142,7 @@ export default function TodoList({ todos, setTodos, regulars, toggleRegular, isR
     setIsDragging(false);
     setOverDelete(false);
     setActiveId(null);
+    document.body.style.overflow = '';
   }
 
   return (

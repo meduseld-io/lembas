@@ -87,6 +87,7 @@ export default function ShoppingList({ items, setItems, addItem, regulars, toggl
   function handleDragStart() {
     setIsDragging(true);
     setOverDelete(false);
+    document.body.style.overflow = 'hidden';
     const onPointerMove = (e) => {
       lastPointer.current = { x: e.clientX, y: e.clientY };
       setOverDelete(isPointerOverDelete());
@@ -105,6 +106,7 @@ export default function ShoppingList({ items, setItems, addItem, regulars, toggl
 
     setIsDragging(false);
     setOverDelete(false);
+    document.body.style.overflow = '';
 
     if (droppedOnDelete) {
       setItems(prev => prev.filter(i => i.id !== active.id));
@@ -138,6 +140,7 @@ export default function ShoppingList({ items, setItems, addItem, regulars, toggl
   function handleDragCancel() {
     setIsDragging(false);
     setOverDelete(false);
+    document.body.style.overflow = '';
   }
 
   function handleCheck(id) {
