@@ -1,6 +1,7 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useStorage } from './useStorage.js';
-import { ShoppingCart, LayoutList, Plus, ChevronDown, Pencil, Trash2, X } from 'lucide-react';
+import { useAuth } from './useAuth.js';
+import { ShoppingCart, LayoutList, Plus, ChevronDown, Pencil, Trash2, X, User } from 'lucide-react';
 import ShoppingList from './ShoppingList.jsx';
 import RegularsGrid from './RegularsGrid.jsx';
 import TodoList from './TodoList.jsx';
@@ -15,6 +16,7 @@ export default function App() {
     items, setItems, regulars, setRegulars, shops, setShops,
     mode, setMode, lists, setLists, activeListId, setActiveListId,
   } = useStorage();
+  const { user, ready, login, logout, syncData, saveData } = useAuth();
   const [tab, setTab] = useState('list');
   const [showHelp, setShowHelp] = useState(false);
   const [showListPicker, setShowListPicker] = useState(false);
@@ -23,6 +25,35 @@ export default function App() {
   const [editingListId, setEditingListId] = useState(null);
   const [editListName, setEditListName] = useState('');
 
+  // Sync with Meduseld Account on login
+  useEffect(() => {
+    if (!ready || !user) return;
+    const localUpdatedAt = localStorage.getItem('lembas_last_sync') || '1970-01-01T00:00:00Z';
+    const localData = { items, regulars, shops, mode, lists, activeListId };
+    syncData(localData, localUpdatedAt).then(result => {
+      if (result.source === 'server' && result.data) {
+        const d = result.data;
+        if (d.items) setItems(d.items);
+        if (d.regulars) setRegulars(d.regulars);
+        if (d.shops) setShops(d.shops);
+        if (d.lists) setLists(d.lists);
+        if (d.activeListId) setActiveListId(d.activeListId);
+        if (d.mode) setMode(d.mode);
+      }
+      localStorage.setItem('lembas_last_sync', new Date().toISOString());
+    });
+  }, [ready, user]);
+
+  // Debounced save to account on data changes
+  useEffect(() => {
+    if (!user) return;
+    const timeout = setTimeout(() => {
+      const data = { items, regulars, shops, mode, lists, activeListId };
+      saveData(data);
+      localStorage.setItem('lembas_last_sync', new Date().toISOString());
+    }, 2000);
+    return () => clearTimeout(timeout);
+  }, [items, regulars, shops, mode, lists, activeListId, user]);
   const activeList = lists.find(l => l.id === activeListId) || lists[0];
   const activeItems = activeList?.items || [];
 
@@ -131,6 +162,9 @@ export default function App() {
             <LayoutList size={16} />
           </button>
         </div>
+        <button className="account-btn" onClick={() => user ? logout() : login()} aria-label={user ? 'Sign out' : 'Sign in'} title={user ? `Signed in as ${user.displayName || user.email}` : 'Sign in to sync'}>
+          {user ? <span className="account-avatar">{(user.displayName || user.email)[0].toUpperCase()}</span> : <User size={16} />}
+        </button>
         <button className="help-btn" onClick={() => setShowHelp(true)} aria-label="Help">?</button>
       </header>
 
