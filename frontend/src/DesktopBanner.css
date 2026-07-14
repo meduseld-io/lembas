@@ -1,0 +1,42 @@
+/* Only show the desktop banner on non-mobile screens */
+.desktop-banner {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: rgba(255, 193, 7, 0.12);
+  border-bottom: 1px solid rgba(255, 193, 7, 0.25);
+  color: var(--text-secondary, #b8b8b8);
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.desktop-banner-icon {
+  flex-shrink: 0;
+  color: #ffc107;
+}
+
+.desktop-banner-close {
+  margin-left: auto;
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: var(--text-muted, #888);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  transition: color 0.15s, background 0.15s;
+}
+.desktop-banner-close:hover {
+  color: var(--text, #fff);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Show only on viewports wider than typical mobile */
+@media (min-width: 768px) {
+  .desktop-banner {
+    display: flex;
+  }
+}

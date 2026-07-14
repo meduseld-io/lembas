@@ -24,6 +24,7 @@ export default function HelpModal({ onClose, mode }) {
           <div>
             <p className="help-title">Modes</p>
             <p>Switch between Shopping and Lists modes using the icons in the header. Shopping mode tracks items with prices and quantities. Lists mode lets you create custom checklists.</p>
+            <p style={{marginTop: '6px', fontSize: '0.78rem', opacity: 0.7}}>Lembas is designed for mobile - drag gestures and touch interactions work best on a phone.</p>
           </div>
         </div>
 

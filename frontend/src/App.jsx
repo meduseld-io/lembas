@@ -5,6 +5,7 @@ import ShoppingList from './ShoppingList.jsx';
 import RegularsGrid from './RegularsGrid.jsx';
 import TodoList from './TodoList.jsx';
 import HelpModal from './HelpModal.jsx';
+import DesktopBanner from './DesktopBanner.jsx';
 import './App.css';
 
 // Lists mode has no tabs — the list picker dropdown is the only navigation.
@@ -132,6 +133,8 @@ export default function App() {
         </div>
         <button className="help-btn" onClick={() => setShowHelp(true)} aria-label="Help">?</button>
       </header>
+
+      <DesktopBanner />
 
       {mode === 'lists' && (
         <div className="list-picker-bar">
