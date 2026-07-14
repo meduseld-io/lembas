@@ -4,30 +4,37 @@
 
 # Lembas
 
-A simple, phone-first PWA for to-do lists and shopping lists. Switch between modes with a tap - your data stays separate and persists locally in the browser.
+A simple, phone-first PWA for shopping lists and custom to-do lists. Switch between modes with a tap - your data stays separate and persists locally in the browser.
 
 ## Features
 
-- **Two modes** - To-Do for task lists, Shopping for grocery runs. Toggle between them with the icons in the header
-- **Regulars** - star frequently used items to save them. Tap a regular to quickly re-add it to your current list. Shared across both modes
-- **Drag to reorder** - long-press (300ms) to pick up an item, drag to rearrange
-- **Drag to delete** - drop an item on the trash zone that appears at the bottom while dragging
+- **Two modes** - Shopping (default) for grocery runs, Lists for custom task categories. Toggle between them with the icons in the header
+- **Drag to reorder** - grip handle on each item, drag to rearrange (uses @dnd-kit, works on touch and desktop)
+- **Drag to delete** - drop an item on the red delete zone that appears at the bottom while dragging
 - **Autocomplete** - regulars appear as suggestions while typing in the add bar
 - **Offline support** - fully functional offline as a PWA with service worker caching
 - **No account needed** - all data stored in browser localStorage, no backend
 
-### To-Do Mode (default)
-
-- Add tasks, check them off, clear completed
-- Star tasks to save as regulars
-
-### Shopping Mode
+### Shopping Mode (default)
 
 - Add items with quantity, price, and aisle/location metadata
+- Tap any item to open an edit modal (bottom sheet on mobile)
+- Estimated shop total shown when items have prices
+- Star items to save as regulars for future lists
 - Check off items to move them into a dated shop with a running total
 - Shop history with expandable cards showing what was bought
-- Drag items onto past shop cards to add retroactively
-- Estimated total shown when items have prices
+- Drag uncompleted items onto past shop cards to add retroactively
+- Regulars tab with grid of starred items, tap to re-add to list
+
+### Lists Mode
+
+- Multiple user-created list categories (tasks, packing, errands, etc.)
+- Default "Tasks" list (migrates existing data on first load)
+- List picker dropdown to switch between lists
+- Create, rename, and delete lists from the dropdown
+- Each list has its own items and regulars stored independently
+- Simple checklist UI with checkbox, tap name to edit, "Move to list" option
+- Clear completed items, or clear entire list
 
 ## Tech Stack
 
