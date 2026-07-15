@@ -13,7 +13,8 @@ A simple, phone-first PWA for shopping lists and custom to-do lists. Switch betw
 - **Drag to delete** - drop an item on the red delete zone that appears at the bottom while dragging
 - **Autocomplete** - regulars appear as suggestions while typing in the add bar
 - **Offline support** - fully functional offline as a PWA with service worker caching
-- **No account needed** - all data stored in browser localStorage, no backend
+- **Meduseld Account** - optional sign-in to sync data across devices via accounts.meduseld.io (app works fully without an account using localStorage only)
+- **No account needed** - all data stored in browser localStorage by default, no backend required
 
 ### Shopping Mode (default)
 
