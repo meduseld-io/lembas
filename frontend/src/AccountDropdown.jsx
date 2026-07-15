@@ -55,6 +55,7 @@ export default function AccountDropdown({ user, loginInline, signupInline, logou
   }
 
   const initial = user ? (user.displayName || user.email)[0].toUpperCase() : null;
+  const avatarUrl = user && user.avatar ? `https://accounts.meduseld.io/avatars/${user.avatar}.png` : null;
 
   return (
     <div className="account-wrapper" ref={wrapperRef}>
@@ -63,7 +64,7 @@ export default function AccountDropdown({ user, loginInline, signupInline, logou
         onClick={() => setOpen(!open)}
         title={user ? `Signed in as ${user.displayName || user.email}` : 'Sign in to sync across devices'}
       >
-        {user ? initial : <User size={16} />}
+        {user ? (avatarUrl ? <img src={avatarUrl} alt="" className="account-avatar-img" /> : initial) : <User size={16} />}
       </button>
       {open && (
         <div className="account-dropdown">
