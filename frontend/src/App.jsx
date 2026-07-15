@@ -7,6 +7,7 @@ import RegularsGrid from './RegularsGrid.jsx';
 import TodoList from './TodoList.jsx';
 import HelpModal from './HelpModal.jsx';
 import DesktopBanner from './DesktopBanner.jsx';
+import AccountDropdown from './AccountDropdown.jsx';
 import './App.css';
 
 // Lists mode has no tabs — the list picker dropdown is the only navigation.
@@ -16,7 +17,7 @@ export default function App() {
     items, setItems, regulars, setRegulars, shops, setShops,
     mode, setMode, lists, setLists, activeListId, setActiveListId,
   } = useStorage();
-  const { user, ready, login, logout, syncData, saveData } = useAuth();
+  const { user, ready, login, loginInline, signupInline, logout, syncData, saveData } = useAuth();
   const [tab, setTab] = useState('list');
   const [showHelp, setShowHelp] = useState(false);
   const [showListPicker, setShowListPicker] = useState(false);
@@ -162,9 +163,7 @@ export default function App() {
             <LayoutList size={16} />
           </button>
         </div>
-        <button className="account-btn" onClick={() => user ? logout() : login()} aria-label={user ? 'Sign out' : 'Sign in'} title={user ? `Signed in as ${user.displayName || user.email}` : 'Sign in to sync'}>
-          {user ? <span className="account-avatar">{(user.displayName || user.email)[0].toUpperCase()}</span> : <User size={16} />}
-        </button>
+        <AccountDropdown user={user} loginInline={loginInline} signupInline={signupInline} logout={logout} />
         <button className="help-btn" onClick={() => setShowHelp(true)} aria-label="Help">?</button>
       </header>
 

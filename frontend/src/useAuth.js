@@ -22,6 +22,14 @@ export function useAuth() {
     auth.login();
   }
 
+  async function loginInline(email, password) {
+    return auth.loginInline(email, password);
+  }
+
+  async function signupInline(email, password, displayName) {
+    return auth.signupInline(email, password, displayName);
+  }
+
   function logout() {
     auth.logout();
   }
@@ -41,5 +49,5 @@ export function useAuth() {
     return auth.loadData();
   }
 
-  return { user, ready, login, logout, syncData, saveData, loadData, isAuthenticated: !!user };
+  return { user, ready, login, loginInline, signupInline, logout, syncData, saveData, loadData, isAuthenticated: !!user };
 }
