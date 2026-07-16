@@ -26,6 +26,8 @@
   border-color: var(--green-500);
   background: var(--green-500);
   color: #fff;
+  overflow: hidden;
+  padding: 0;
 }
 
 .account-dropdown {
@@ -160,4 +162,6 @@
   height: 100%;
   border-radius: 50%;
   object-fit: cover;
+  object-position: center 15%;
+  display: block;
 }

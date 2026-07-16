@@ -26,6 +26,31 @@ export default function App() {
   const [editingListId, setEditingListId] = useState(null);
   const [editListName, setEditListName] = useState('');
 
+  // Wrap logout to save data to account then clear localStorage
+  const handleLogout = useCallback(async () => {
+    try {
+      const data = { items, regulars, shops, mode, lists, activeListId };
+      await saveData(data);
+    } catch (e) {
+      console.error('Failed to save data before logout:', e);
+    }
+    // Clear local data so next user on this device starts fresh
+    localStorage.removeItem('lembas_items');
+    localStorage.removeItem('lembas_regulars');
+    localStorage.removeItem('lembas_shops');
+    localStorage.removeItem('lembas_lists');
+    localStorage.removeItem('lembas_active_list');
+    localStorage.removeItem('lembas_mode');
+    localStorage.removeItem('lembas_last_sync');
+    setItems([]);
+    setRegulars([]);
+    setShops([]);
+    setLists([{ id: 'tasks', name: 'Tasks', items: [], regulars: [] }]);
+    setActiveListId('tasks');
+    setMode('shopping');
+    logout();
+  }, [items, regulars, shops, mode, lists, activeListId, saveData, logout, setItems, setRegulars, setShops, setLists, setActiveListId, setMode]);
+
   // Sync with Meduseld Account on login
   useEffect(() => {
     if (!ready || !user) return;
@@ -163,7 +188,7 @@ export default function App() {
             <LayoutList size={16} />
           </button>
         </div>
-        <AccountDropdown user={user} loginInline={loginInline} signupInline={signupInline} logout={logout} />
+        <AccountDropdown user={user} loginInline={loginInline} signupInline={signupInline} logout={handleLogout} />
         <button className="help-btn" onClick={() => setShowHelp(true)} aria-label="Help">?</button>
       </header>
 
