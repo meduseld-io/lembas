@@ -129,9 +129,25 @@
   font-size: 0.78rem;
   color: var(--text-secondary);
 }
-.account-dropdown .btn-logout {
+.account-dropdown .btn-app-settings {
   width: 100%;
   margin-top: 0.75rem;
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 0.45rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.account-dropdown .btn-app-settings:hover {
+  border-color: var(--green-500);
+  color: var(--green-500);
+}
+.account-dropdown .btn-logout {
+  width: 100%;
+  margin-top: 0.5rem;
   background: none;
   border: 1px solid var(--border);
   color: var(--text-secondary);

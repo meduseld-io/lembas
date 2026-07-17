@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { User } from 'lucide-react';
 import './AccountDropdown.css';
 
-export default function AccountDropdown({ user, loginInline, signupInline, logout }) {
+export default function AccountDropdown({ user, loginInline, signupInline, logout, onSettings }) {
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState('login');
   const [email, setEmail] = useState('');
@@ -74,6 +74,7 @@ export default function AccountDropdown({ user, loginInline, signupInline, logou
                 <span className="account-name">{user.displayName || user.email}</span>
                 <span className="account-email">{user.email}</span>
               </div>
+              {onSettings && <button className="btn-app-settings" onClick={() => { setOpen(false); onSettings(); }}>App Settings</button>}
               <button className="btn-logout" onClick={handleLogout}>Sign out</button>
               <a className="account-manage" href="https://accounts.meduseld.io" target="_blank" rel="noreferrer">Manage account</a>
             </>
