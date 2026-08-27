@@ -1,13 +1,11 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { useStorage } from './useStorage.js';
-import { useAuth } from './useAuth.js';
-import { ShoppingCart, LayoutList, Plus, ChevronDown, Pencil, Trash2, X, User } from 'lucide-react';
+import { ShoppingCart, LayoutList, Plus, ChevronDown, Pencil, Trash2, X } from 'lucide-react';
 import ShoppingList from './ShoppingList.jsx';
 import RegularsGrid from './RegularsGrid.jsx';
 import TodoList from './TodoList.jsx';
 import HelpModal from './HelpModal.jsx';
 import DesktopBanner from './DesktopBanner.jsx';
-import AccountDropdown from './AccountDropdown.jsx';
 import './App.css';
 
 // Lists mode has no tabs — the list picker dropdown is the only navigation.
@@ -17,7 +15,6 @@ export default function App() {
     items, setItems, regulars, setRegulars, shops, setShops,
     mode, setMode, lists, setLists, activeListId, setActiveListId,
   } = useStorage();
-  const { user, ready, login, loginInline, signupInline, logout, syncData, saveData } = useAuth();
   const [tab, setTab] = useState('list');
   const [showHelp, setShowHelp] = useState(false);
   const [showListPicker, setShowListPicker] = useState(false);
@@ -26,60 +23,6 @@ export default function App() {
   const [editingListId, setEditingListId] = useState(null);
   const [editListName, setEditListName] = useState('');
 
-  // Wrap logout to save data to account then clear localStorage
-  const handleLogout = useCallback(async () => {
-    try {
-      const data = { items, regulars, shops, mode, lists, activeListId };
-      await saveData(data);
-    } catch (e) {
-      console.error('Failed to save data before logout:', e);
-    }
-    // Clear local data so next user on this device starts fresh
-    localStorage.removeItem('lembas_items');
-    localStorage.removeItem('lembas_regulars');
-    localStorage.removeItem('lembas_shops');
-    localStorage.removeItem('lembas_lists');
-    localStorage.removeItem('lembas_active_list');
-    localStorage.removeItem('lembas_mode');
-    localStorage.removeItem('lembas_last_sync');
-    setItems([]);
-    setRegulars([]);
-    setShops([]);
-    setLists([{ id: 'tasks', name: 'Tasks', items: [], regulars: [] }]);
-    setActiveListId('tasks');
-    setMode('shopping');
-    logout();
-  }, [items, regulars, shops, mode, lists, activeListId, saveData, logout, setItems, setRegulars, setShops, setLists, setActiveListId, setMode]);
-
-  // Sync with Meduseld Account on login
-  useEffect(() => {
-    if (!ready || !user) return;
-    const localUpdatedAt = localStorage.getItem('lembas_last_sync') || '1970-01-01T00:00:00Z';
-    const localData = { items, regulars, shops, mode, lists, activeListId };
-    syncData(localData, localUpdatedAt).then(result => {
-      if (result.source === 'server' && result.data) {
-        const d = result.data;
-        if (d.items) setItems(d.items);
-        if (d.regulars) setRegulars(d.regulars);
-        if (d.shops) setShops(d.shops);
-        if (d.lists) setLists(d.lists);
-        if (d.activeListId) setActiveListId(d.activeListId);
-        if (d.mode) setMode(d.mode);
-      }
-      localStorage.setItem('lembas_last_sync', new Date().toISOString());
-    });
-  }, [ready, user]);
-
-  // Debounced save to account on data changes
-  useEffect(() => {
-    if (!user) return;
-    const timeout = setTimeout(() => {
-      const data = { items, regulars, shops, mode, lists, activeListId };
-      saveData(data);
-      localStorage.setItem('lembas_last_sync', new Date().toISOString());
-    }, 2000);
-    return () => clearTimeout(timeout);
-  }, [items, regulars, shops, mode, lists, activeListId, user]);
   const activeList = lists.find(l => l.id === activeListId) || lists[0];
   const activeItems = activeList?.items || [];
 
@@ -188,7 +131,6 @@ export default function App() {
             <LayoutList size={16} />
           </button>
         </div>
-        <AccountDropdown user={user} loginInline={loginInline} signupInline={signupInline} logout={handleLogout} />
         <button className="help-btn" onClick={() => setShowHelp(true)} aria-label="Help">?</button>
       </header>
 
@@ -292,7 +234,6 @@ export default function App() {
             lists={lists}
             activeListId={activeListId}
             onMoveItem={(itemId, targetListId) => {
-              // Remove from current list and add to target list
               const item = activeItems.find(t => t.id === itemId);
               if (!item) return;
               setActiveItems(prev => prev.filter(t => t.id !== itemId));
