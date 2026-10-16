@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lembas-v8';
+const CACHE_NAME = 'lembas-v9';
 
 self.addEventListener('install', (e) => {
   e.waitUntil(
@@ -10,6 +10,8 @@ self.addEventListener('install', (e) => {
         '/logo.png',
         '/favicon.ico',
         '/apple-touch-icon.png',
+        '/icon-192.png',
+        '/icon-512.png',
       ])
     )
   );

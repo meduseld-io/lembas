@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { normalizePrice } from './price.js';
 import './EditModal.css';
 
 export default function EditModal({ item, onSave, onClose, onDelete }) {
@@ -22,7 +23,7 @@ export default function EditModal({ item, onSave, onClose, onDelete }) {
       id: item.id,
       name: name.trim(),
       qty: Math.max(1, parseInt(qty) || 1),
-      price: price.trim(),
+      price: normalizePrice(price),
       aisle: aisle.trim(),
     });
   }

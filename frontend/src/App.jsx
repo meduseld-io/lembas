@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useStorage } from './useStorage.js';
+import { newId } from './ids.js';
 import { ShoppingCart, LayoutList, Plus, ChevronDown, Pencil, Trash2, X } from 'lucide-react';
 import ShoppingList from './ShoppingList.jsx';
 import RegularsGrid from './RegularsGrid.jsx';
@@ -24,6 +25,8 @@ export default function App() {
   const [editListName, setEditListName] = useState('');
 
   const activeList = lists.find(l => l.id === activeListId) || lists[0];
+  // The saved id can point at a list that no longer exists; always write to the list on screen
+  const currentListId = activeList?.id;
   const activeItems = activeList?.items || [];
 
   // Per-mode regulars: shopping uses top-level regulars, each list has its own
@@ -32,7 +35,7 @@ export default function App() {
   const setActiveRegulars = useCallback((updater) => {
     if (mode === 'lists') {
       setLists(prev => prev.map(l => {
-        if (l.id !== activeListId) return l;
+        if (l.id !== currentListId) return l;
         const regs = l.regulars || [];
         const next = typeof updater === 'function' ? updater(regs) : updater;
         return { ...l, regulars: next };
@@ -40,16 +43,16 @@ export default function App() {
     } else {
       setRegulars(updater);
     }
-  }, [mode, activeListId, setLists, setRegulars]);
+  }, [mode, currentListId, setLists, setRegulars]);
 
   const setActiveItems = useCallback((updater) => {
     setLists(prev => prev.map(l => {
-      if (l.id !== activeListId) return l;
+      if (l.id !== currentListId) return l;
       const current = l.items || [];
       const next = typeof updater === 'function' ? updater(current) : updater;
       return { ...l, items: next };
     }));
-  }, [setLists, activeListId]);
+  }, [setLists, currentListId]);
 
   const addItem = useCallback((name, qty = 1) => {
     name = name.trim();
@@ -59,7 +62,7 @@ export default function App() {
       if (existing) {
         return prev.map(i => i.id === existing.id ? { ...i, qty: i.qty + 1 } : i);
       }
-      return [...prev, { id: Date.now(), name, qty, checked: false, price: '', aisle: '' }];
+      return [...prev, { id: newId(), name, qty, checked: false, price: '', aisle: '' }];
     });
   }, [setItems]);
 
@@ -79,7 +82,7 @@ export default function App() {
     e.preventDefault();
     const name = newListName.trim();
     if (!name) return;
-    const id = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') + '-' + Date.now();
+    const id = newId();
     setLists(prev => [...prev, { id, name, items: [], regulars: [] }]);
     setActiveListId(id);
     setNewListName('');
@@ -89,8 +92,11 @@ export default function App() {
 
   function handleDeleteList(id) {
     if (lists.length <= 1) return;
+    const list = lists.find(l => l.id === id);
+    const count = list?.items?.length || 0;
+    if (!window.confirm(`Delete "${list?.name}"${count ? ` and its ${count} item${count === 1 ? '' : 's'}` : ''}?`)) return;
     setLists(prev => prev.filter(l => l.id !== id));
-    if (activeListId === id) {
+    if (currentListId === id) {
       const remaining = lists.filter(l => l.id !== id);
       setActiveListId(remaining[0]?.id || 'tasks');
     }
@@ -147,7 +153,7 @@ export default function App() {
             <div className="list-picker-backdrop" onClick={() => setShowListPicker(false)} />
             <div className="list-picker-dropdown">
               {lists.map(l => (
-                <div key={l.id} className={`list-picker-item ${l.id === activeListId ? 'active' : ''}`}>
+                <div key={l.id} className={`list-picker-item ${l.id === currentListId ? 'active' : ''}`}>
                   {editingListId === l.id ? (
                     <form onSubmit={handleRenameList} className="list-rename-form">
                       <input
@@ -232,14 +238,17 @@ export default function App() {
             toggleRegular={toggleRegular}
             isRegular={isRegular}
             lists={lists}
-            activeListId={activeListId}
+            activeListId={currentListId}
             onMoveItem={(itemId, targetListId) => {
               const item = activeItems.find(t => t.id === itemId);
               if (!item) return;
               setActiveItems(prev => prev.filter(t => t.id !== itemId));
               setLists(prev => prev.map(l => {
                 if (l.id !== targetListId) return l;
-                return { ...l, items: [...(l.items || []), { ...item, done: false }] };
+                const target = l.items || [];
+                // Already on the target list and not done: don't add a second copy
+                if (target.some(t => !t.done && t.name.toLowerCase() === item.name.toLowerCase())) return l;
+                return { ...l, items: [...target, { ...item, done: false }] };
               }));
             }}
           />

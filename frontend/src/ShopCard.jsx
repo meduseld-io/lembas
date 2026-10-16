@@ -2,20 +2,18 @@ import { useState } from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import { ChevronDown, ChevronRight, Trash2 } from 'lucide-react';
 import { parseLocalDate } from './dates.js';
+import { lineTotal } from './price.js';
 import './ShopCard.css';
 
 export default function ShopCard({ shop, onDelete }) {
   const [expanded, setExpanded] = useState(false);
-  const { isOver, setNodeRef } = useDroppable({ id: `shop-${shop.id}` });
+  const { isOver, setNodeRef } = useDroppable({ id: `shop-${shop.id}`, data: { shopId: shop.id } });
 
   const dateStr = parseLocalDate(shop.date).toLocaleDateString(undefined, {
     weekday: 'short', day: 'numeric', month: 'short', year: 'numeric'
   });
 
-  const total = shop.items.reduce((sum, i) => {
-    const p = parseFloat(i.price);
-    return sum + (isNaN(p) ? 0 : p * (i.qty || 1));
-  }, 0);
+  const total = lineTotal(shop.items);
 
   return (
     <div

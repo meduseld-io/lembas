@@ -30,10 +30,9 @@ export default function TodoItem({ item, onToggle, onDelete, onStar, starred, on
       className={`todo-item ${item.done ? 'done' : ''} ${isDragging ? 'dragging' : ''}`}
       ref={setRef}
       style={style}
-      {...attributes}
     >
       {sortable && (
-        <div className="drag-handle" {...listeners} style={{ touchAction: 'none' }}>
+        <div className="drag-handle" {...attributes} {...listeners} aria-label="Drag to reorder" style={{ touchAction: 'none' }}>
           <GripVertical size={16} />
         </div>
       )}

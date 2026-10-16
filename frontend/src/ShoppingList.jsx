@@ -1,11 +1,13 @@
-import { useState, useRef, useMemo, useCallback } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { DndContext, closestCenter, MouseSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
 import { Trash2, ShoppingCart, Star as StarIcon } from 'lucide-react';
 import ItemRow from './ItemRow.jsx';
 import ShopCard from './ShopCard.jsx';
 import EditModal from './EditModal.jsx';
-import { pointerFromEvent } from './pointer.js';
+import { useDragToDelete } from './useDragToDelete.js';
+import { newId } from './ids.js';
+import { lineTotal } from './price.js';
 import { localDateString } from './dates.js';
 import './ShoppingList.css';
 
@@ -14,20 +16,12 @@ export default function ShoppingList({ items, setItems, addItem, regulars, toggl
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [highlightIdx, setHighlightIdx] = useState(-1);
   const [editingItem, setEditingItem] = useState(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const [overDelete, setOverDelete] = useState(false);
   const inputRef = useRef(null);
-  const deleteZoneRef = useRef(null);
-  const lastPointer = useRef({ x: 0, y: 0 });
+  const { deleteZoneRef, isDragging, overDelete, startDrag, endDrag, cancelDrag } = useDragToDelete();
 
   const total = items.length;
 
-  const estimatedTotal = useMemo(() => {
-    return items.reduce((sum, i) => {
-      const p = parseFloat(i.price);
-      return sum + (isNaN(p) ? 0 : p * (i.qty || 1));
-    }, 0);
-  }, [items]);
+  const estimatedTotal = useMemo(() => lineTotal(items), [items]);
 
   const suggestions = useMemo(() => {
     const val = inputVal.trim().toLowerCase();
@@ -39,14 +33,6 @@ export default function ShoppingList({ items, setItems, addItem, regulars, toggl
     useSensor(MouseSensor, { activationConstraint: { distance: 5 } }),
     useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 8 } })
   );
-
-  function isPointerOverDelete() {
-    const el = deleteZoneRef.current;
-    if (!el) return false;
-    const rect = el.getBoundingClientRect();
-    const { x, y } = lastPointer.current;
-    return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
-  }
 
   function handleAdd() {
     addItem(inputVal);
@@ -86,33 +72,9 @@ export default function ShoppingList({ items, setItems, addItem, regulars, toggl
     setShowSuggestions(e.target.value.trim().length > 0);
   }
 
-  function handleDragStart(event) {
-    setIsDragging(true);
-    setOverDelete(false);
-    document.body.style.overflow = 'hidden';
-    // Start from where this drag began, not where the last one ended
-    lastPointer.current = pointerFromEvent(event.activatorEvent);
-    const onPointerMove = (e) => {
-      lastPointer.current = { x: e.clientX, y: e.clientY };
-      setOverDelete(isPointerOverDelete());
-    };
-    const onPointerUp = () => {
-      window.removeEventListener('pointermove', onPointerMove);
-      window.removeEventListener('pointerup', onPointerUp);
-      window.removeEventListener('pointercancel', onPointerUp);
-    };
-    window.addEventListener('pointermove', onPointerMove);
-    window.addEventListener('pointerup', onPointerUp);
-    window.addEventListener('pointercancel', onPointerUp);
-  }
-
   function handleDragEnd(event) {
     const { active, over } = event;
-    const droppedOnDelete = isPointerOverDelete();
-
-    setIsDragging(false);
-    setOverDelete(false);
-    document.body.style.overflow = '';
+    const droppedOnDelete = endDrag();
 
     if (droppedOnDelete) {
       setItems(prev => prev.filter(i => i.id !== active.id));
@@ -122,8 +84,8 @@ export default function ShoppingList({ items, setItems, addItem, regulars, toggl
     if (!over) return;
 
     // Dropped on a shop card
-    if (typeof over.id === 'string' && over.id.startsWith('shop-')) {
-      const shopId = parseInt(over.id.replace('shop-', ''));
+    const shopId = over.data.current?.shopId;
+    if (shopId !== undefined) {
       const item = items.find(i => i.id === active.id);
       if (!item) return;
       setShops(prev => prev.map(s => {
@@ -143,12 +105,6 @@ export default function ShoppingList({ items, setItems, addItem, regulars, toggl
     }
   }
 
-  function handleDragCancel() {
-    setIsDragging(false);
-    setOverDelete(false);
-    document.body.style.overflow = '';
-  }
-
   function handleCheck(id) {
     const item = items.find(i => i.id === id);
     if (!item) return;
@@ -160,7 +116,7 @@ export default function ShoppingList({ items, setItems, addItem, regulars, toggl
       if (existing) {
         return prev.map(s => s.id === existing.id ? { ...s, items: [...s.items, shopItem] } : s);
       }
-      return [{ id: Date.now(), date: today, items: [shopItem] }, ...prev];
+      return [{ id: newId(), date: today, items: [shopItem] }, ...prev];
     });
     setItems(prev => prev.filter(i => i.id !== id));
   }
@@ -170,6 +126,7 @@ export default function ShoppingList({ items, setItems, addItem, regulars, toggl
   }
 
   function handleDeleteShop(shopId) {
+    if (!window.confirm('Delete this shop from your history?')) return;
     setShops(prev => prev.filter(s => s.id !== shopId));
   }
 
@@ -182,7 +139,21 @@ export default function ShoppingList({ items, setItems, addItem, regulars, toggl
   }
 
   function handleSaveEdit(updated) {
-    setItems(prev => prev.map(i => i.id === updated.id ? { ...i, ...updated } : i));
+    setItems(prev => {
+      // Renamed to the name of another item: merge into that one instead of keeping two
+      const dupe = prev.find(i => i.id !== updated.id && i.name.toLowerCase() === updated.name.toLowerCase());
+      if (dupe) {
+        return prev
+          .filter(i => i.id !== updated.id)
+          .map(i => i.id === dupe.id ? {
+            ...i,
+            qty: i.qty + updated.qty,
+            price: i.price || updated.price,
+            aisle: i.aisle || updated.aisle,
+          } : i);
+      }
+      return prev.map(i => i.id === updated.id ? { ...i, ...updated } : i);
+    });
     setEditingItem(null);
   }
 
@@ -233,9 +204,9 @@ export default function ShoppingList({ items, setItems, addItem, regulars, toggl
         <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
-          onDragStart={handleDragStart}
+          onDragStart={startDrag}
           onDragEnd={handleDragEnd}
-          onDragCancel={handleDragCancel}
+          onDragCancel={cancelDrag}
         >
           {items.length > 0 && (
             <SortableContext items={items.map(i => i.id)} strategy={verticalListSortingStrategy}>

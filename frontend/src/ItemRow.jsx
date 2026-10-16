@@ -54,13 +54,12 @@ export default function ItemRow({ item, onCheck, onQty, onStar, starred, onTap, 
       className={`item ${item.checked ? 'checked' : ''} ${isDragging ? 'dragging' : ''}`}
       ref={setRef}
       style={style}
-      {...attributes}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
     >
       {sortable && (
-        <div className="drag-handle" {...listeners} style={{ touchAction: 'none' }}>
+        <div className="drag-handle" {...attributes} {...listeners} aria-label="Drag to reorder" style={{ touchAction: 'none' }}>
           <GripVertical size={16} />
         </div>
       )}
