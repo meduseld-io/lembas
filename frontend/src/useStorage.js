@@ -12,7 +12,11 @@ const DEFAULT_LISTS = [{ id: 'tasks', name: 'Tasks' }];
 function load(key, fallback) {
   try {
     const raw = localStorage.getItem(key);
-    return raw ? JSON.parse(raw) : fallback;
+    if (!raw) return fallback;
+    const value = JSON.parse(raw);
+    // Every stored collection is an array; anything else is damaged data
+    if (Array.isArray(fallback) && !Array.isArray(value)) return fallback;
+    return value;
   } catch (e) {
     console.error(`Failed to load ${key} from localStorage:`, e);
     return fallback;
@@ -28,9 +32,17 @@ function save(key, value) {
 }
 
 function loadItems() {
-  return load(ITEMS_KEY, []).filter(i => !i.checked).map(i => ({
+  return load(ITEMS_KEY, []).filter(i => i && !i.checked).map(i => ({
     ...i, price: i.price ?? '', aisle: i.aisle ?? '',
   }));
+}
+
+function loadRegulars() {
+  return load(REGULARS_KEY, []).filter(r => typeof r === 'string');
+}
+
+function loadShops() {
+  return load(SHOPS_KEY, []).filter(s => s && Array.isArray(s.items));
 }
 
 function loadMode() {
@@ -46,10 +58,14 @@ function loadMode() {
 }
 
 function loadLists() {
-  const lists = load(LISTS_KEY, null);
-  if (lists && lists.length) {
-    // Ensure each list has a regulars array
-    return lists.map(l => ({ ...l, regulars: l.regulars || [] }));
+  const lists = load(LISTS_KEY, []).filter(l => l && l.id);
+  if (lists.length) {
+    // Ensure each list has items and regulars arrays
+    return lists.map(l => ({
+      ...l,
+      items: Array.isArray(l.items) ? l.items : [],
+      regulars: Array.isArray(l.regulars) ? l.regulars : [],
+    }));
   }
   // Migrate old todos into the default Tasks list
   const oldTodos = load('lembas_todos', []);
@@ -72,8 +88,8 @@ function loadActiveList() {
 
 export function useStorage() {
   const [items, setItemsState] = useState(loadItems);
-  const [regulars, setRegularsState] = useState(() => load(REGULARS_KEY, []));
-  const [shops, setShopsState] = useState(() => load(SHOPS_KEY, []));
+  const [regulars, setRegularsState] = useState(loadRegulars);
+  const [shops, setShopsState] = useState(loadShops);
   const [mode, setModeState] = useState(loadMode);
   const [lists, setListsState] = useState(loadLists);
   const [activeListId, setActiveListIdState] = useState(loadActiveList);
@@ -125,8 +141,8 @@ export function useStorage() {
     function handleStorage(e) {
       if (e.storageArea !== localStorage) return;
       if (e.key === null || e.key === ITEMS_KEY) setItemsState(loadItems());
-      if (e.key === null || e.key === REGULARS_KEY) setRegularsState(load(REGULARS_KEY, []));
-      if (e.key === null || e.key === SHOPS_KEY) setShopsState(load(SHOPS_KEY, []));
+      if (e.key === null || e.key === REGULARS_KEY) setRegularsState(loadRegulars());
+      if (e.key === null || e.key === SHOPS_KEY) setShopsState(loadShops());
       if (e.key === null || e.key === MODE_KEY) setModeState(loadMode());
       if (e.key === null || e.key === LISTS_KEY) setListsState(loadLists());
       if (e.key === null || e.key === ACTIVE_LIST_KEY) setActiveListIdState(loadActiveList());

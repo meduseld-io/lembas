@@ -4,20 +4,18 @@ import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-ki
 import { Trash2, ListChecks, Star as StarIcon, GripVertical } from 'lucide-react';
 import TodoItem from './TodoItem.jsx';
 import TodoEditModal from './TodoEditModal.jsx';
-import { pointerFromEvent } from './pointer.js';
+import { useDragToDelete } from './useDragToDelete.js';
+import { newId } from './ids.js';
 import './TodoList.css';
 
 export default function TodoList({ todos, setTodos, regulars, toggleRegular, isRegular, lists, activeListId, onMoveItem }) {
   const [inputVal, setInputVal] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [highlightIdx, setHighlightIdx] = useState(-1);
-  const [isDragging, setIsDragging] = useState(false);
-  const [overDelete, setOverDelete] = useState(false);
   const [activeId, setActiveId] = useState(null);
   const [editingTodo, setEditingTodo] = useState(null);
   const inputRef = useRef(null);
-  const deleteZoneRef = useRef(null);
-  const lastPointer = useRef({ x: 0, y: 0 });
+  const { deleteZoneRef, isDragging, overDelete, startDrag, endDrag, cancelDrag } = useDragToDelete();
 
   const pending = todos.filter(t => !t.done);
   const completed = todos.filter(t => t.done);
@@ -33,21 +31,13 @@ export default function TodoList({ todos, setTodos, regulars, toggleRegular, isR
     useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 8 } })
   );
 
-  function isPointerOverDelete() {
-    const el = deleteZoneRef.current;
-    if (!el) return false;
-    const rect = el.getBoundingClientRect();
-    const { x, y } = lastPointer.current;
-    return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
-  }
-
   function addTodo(name) {
     name = (name || inputVal).trim();
     if (!name) return;
     setTodos(prev => {
       const existing = prev.find(t => t.name.toLowerCase() === name.toLowerCase() && !t.done);
       if (existing) return prev;
-      return [...prev, { id: Date.now(), name, done: false }];
+      return [...prev, { id: newId(), name, done: false }];
     });
     setInputVal('');
     setShowSuggestions(false);
@@ -95,38 +85,19 @@ export default function TodoList({ todos, setTodos, regulars, toggleRegular, isR
   }
 
   function handleClearAll() {
+    if (!window.confirm(`Remove all ${todos.length} items from this list?`)) return;
     setTodos([]);
   }
 
   function handleDragStart(event) {
     setActiveId(event.active.id);
-    setIsDragging(true);
-    setOverDelete(false);
-    document.body.style.overflow = 'hidden';
-    // Start from where this drag began, not where the last one ended
-    lastPointer.current = pointerFromEvent(event.activatorEvent);
-    const onPointerMove = (e) => {
-      lastPointer.current = { x: e.clientX, y: e.clientY };
-      setOverDelete(isPointerOverDelete());
-    };
-    const onPointerUp = () => {
-      window.removeEventListener('pointermove', onPointerMove);
-      window.removeEventListener('pointerup', onPointerUp);
-      window.removeEventListener('pointercancel', onPointerUp);
-    };
-    window.addEventListener('pointermove', onPointerMove);
-    window.addEventListener('pointerup', onPointerUp);
-    window.addEventListener('pointercancel', onPointerUp);
+    startDrag(event);
   }
 
   function handleDragEnd(event) {
     const { active, over } = event;
-    const droppedOnDelete = isPointerOverDelete();
-
-    setIsDragging(false);
-    setOverDelete(false);
+    const droppedOnDelete = endDrag();
     setActiveId(null);
-    document.body.style.overflow = '';
 
     if (droppedOnDelete) {
       setTodos(prev => prev.filter(t => t.id !== active.id));
@@ -144,10 +115,8 @@ export default function TodoList({ todos, setTodos, regulars, toggleRegular, isR
   }
 
   function handleDragCancel() {
-    setIsDragging(false);
-    setOverDelete(false);
+    cancelDrag();
     setActiveId(null);
-    document.body.style.overflow = '';
   }
 
   return (
