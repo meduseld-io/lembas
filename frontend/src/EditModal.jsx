@@ -21,7 +21,7 @@ export default function EditModal({ item, onSave, onClose, onDelete }) {
     onSave({
       id: item.id,
       name: name.trim(),
-      qty: Math.max(1, qty),
+      qty: Math.max(1, parseInt(qty) || 1),
       price: price.trim(),
       aisle: aisle.trim(),
     });
@@ -49,7 +49,7 @@ export default function EditModal({ item, onSave, onClose, onDelete }) {
                 type="number"
                 min="1"
                 value={qty}
-                onChange={e => setQty(parseInt(e.target.value) || 1)}
+                onChange={e => setQty(e.target.value)}
               />
             </div>
             <div className="field field-sm">

@@ -5,6 +5,8 @@ import { Trash2, ShoppingCart, Star as StarIcon } from 'lucide-react';
 import ItemRow from './ItemRow.jsx';
 import ShopCard from './ShopCard.jsx';
 import EditModal from './EditModal.jsx';
+import { pointerFromEvent } from './pointer.js';
+import { localDateString } from './dates.js';
 import './ShoppingList.css';
 
 export default function ShoppingList({ items, setItems, addItem, regulars, toggleRegular, isRegular, shops, setShops }) {
@@ -84,10 +86,12 @@ export default function ShoppingList({ items, setItems, addItem, regulars, toggl
     setShowSuggestions(e.target.value.trim().length > 0);
   }
 
-  function handleDragStart() {
+  function handleDragStart(event) {
     setIsDragging(true);
     setOverDelete(false);
     document.body.style.overflow = 'hidden';
+    // Start from where this drag began, not where the last one ended
+    lastPointer.current = pointerFromEvent(event.activatorEvent);
     const onPointerMove = (e) => {
       lastPointer.current = { x: e.clientX, y: e.clientY };
       setOverDelete(isPointerOverDelete());
@@ -95,9 +99,11 @@ export default function ShoppingList({ items, setItems, addItem, regulars, toggl
     const onPointerUp = () => {
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('pointerup', onPointerUp);
+      window.removeEventListener('pointercancel', onPointerUp);
     };
     window.addEventListener('pointermove', onPointerMove);
     window.addEventListener('pointerup', onPointerUp);
+    window.addEventListener('pointercancel', onPointerUp);
   }
 
   function handleDragEnd(event) {
@@ -147,7 +153,7 @@ export default function ShoppingList({ items, setItems, addItem, regulars, toggl
     const item = items.find(i => i.id === id);
     if (!item) return;
 
-    const today = new Date().toISOString().split('T')[0];
+    const today = localDateString(new Date());
     setShops(prev => {
       const existing = prev.find(s => s.date === today);
       const shopItem = { name: item.name, qty: item.qty, price: item.price, aisle: item.aisle };

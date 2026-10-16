@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import { ChevronDown, ChevronRight, Trash2 } from 'lucide-react';
+import { parseLocalDate } from './dates.js';
 import './ShopCard.css';
 
 export default function ShopCard({ shop, onDelete }) {
   const [expanded, setExpanded] = useState(false);
   const { isOver, setNodeRef } = useDroppable({ id: `shop-${shop.id}` });
 
-  const dateStr = new Date(shop.date).toLocaleDateString(undefined, {
+  const dateStr = parseLocalDate(shop.date).toLocaleDateString(undefined, {
     weekday: 'short', day: 'numeric', month: 'short', year: 'numeric'
   });
 

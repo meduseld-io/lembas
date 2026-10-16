@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 
 const ITEMS_KEY = 'lembas_items';
 const REGULARS_KEY = 'lembas_regulars';
@@ -16,6 +16,14 @@ function load(key, fallback) {
   } catch (e) {
     console.error(`Failed to load ${key} from localStorage:`, e);
     return fallback;
+  }
+}
+
+function save(key, value) {
+  try {
+    localStorage.setItem(key, typeof value === 'string' ? value : JSON.stringify(value));
+  } catch (e) {
+    console.error(`Failed to save ${key} to localStorage:`, e);
   }
 }
 
@@ -73,7 +81,7 @@ export function useStorage() {
   const setItems = useCallback((updater) => {
     setItemsState(prev => {
       const next = typeof updater === 'function' ? updater(prev) : updater;
-      localStorage.setItem(ITEMS_KEY, JSON.stringify(next));
+      save(ITEMS_KEY, next);
       return next;
     });
   }, []);
@@ -81,7 +89,7 @@ export function useStorage() {
   const setRegulars = useCallback((updater) => {
     setRegularsState(prev => {
       const next = typeof updater === 'function' ? updater(prev) : updater;
-      localStorage.setItem(REGULARS_KEY, JSON.stringify(next));
+      save(REGULARS_KEY, next);
       return next;
     });
   }, []);
@@ -89,27 +97,42 @@ export function useStorage() {
   const setShops = useCallback((updater) => {
     setShopsState(prev => {
       const next = typeof updater === 'function' ? updater(prev) : updater;
-      localStorage.setItem(SHOPS_KEY, JSON.stringify(next));
+      save(SHOPS_KEY, next);
       return next;
     });
   }, []);
 
   const setMode = useCallback((newMode) => {
     setModeState(newMode);
-    localStorage.setItem(MODE_KEY, newMode);
+    save(MODE_KEY, newMode);
   }, []);
 
   const setLists = useCallback((updater) => {
     setListsState(prev => {
       const next = typeof updater === 'function' ? updater(prev) : updater;
-      localStorage.setItem(LISTS_KEY, JSON.stringify(next));
+      save(LISTS_KEY, next);
       return next;
     });
   }, []);
 
   const setActiveListId = useCallback((id) => {
     setActiveListIdState(id);
-    localStorage.setItem(ACTIVE_LIST_KEY, id);
+    save(ACTIVE_LIST_KEY, id);
+  }, []);
+
+  // Another tab or window changed storage: reload so this tab doesn't overwrite it
+  useEffect(() => {
+    function handleStorage(e) {
+      if (e.storageArea !== localStorage) return;
+      if (e.key === null || e.key === ITEMS_KEY) setItemsState(loadItems());
+      if (e.key === null || e.key === REGULARS_KEY) setRegularsState(load(REGULARS_KEY, []));
+      if (e.key === null || e.key === SHOPS_KEY) setShopsState(load(SHOPS_KEY, []));
+      if (e.key === null || e.key === MODE_KEY) setModeState(loadMode());
+      if (e.key === null || e.key === LISTS_KEY) setListsState(loadLists());
+      if (e.key === null || e.key === ACTIVE_LIST_KEY) setActiveListIdState(loadActiveList());
+    }
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
   }, []);
 
   return {

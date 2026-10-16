@@ -4,6 +4,7 @@ import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-ki
 import { Trash2, ListChecks, Star as StarIcon, GripVertical } from 'lucide-react';
 import TodoItem from './TodoItem.jsx';
 import TodoEditModal from './TodoEditModal.jsx';
+import { pointerFromEvent } from './pointer.js';
 import './TodoList.css';
 
 export default function TodoList({ todos, setTodos, regulars, toggleRegular, isRegular, lists, activeListId, onMoveItem }) {
@@ -102,6 +103,8 @@ export default function TodoList({ todos, setTodos, regulars, toggleRegular, isR
     setIsDragging(true);
     setOverDelete(false);
     document.body.style.overflow = 'hidden';
+    // Start from where this drag began, not where the last one ended
+    lastPointer.current = pointerFromEvent(event.activatorEvent);
     const onPointerMove = (e) => {
       lastPointer.current = { x: e.clientX, y: e.clientY };
       setOverDelete(isPointerOverDelete());
@@ -109,9 +112,11 @@ export default function TodoList({ todos, setTodos, regulars, toggleRegular, isR
     const onPointerUp = () => {
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('pointerup', onPointerUp);
+      window.removeEventListener('pointercancel', onPointerUp);
     };
     window.addEventListener('pointermove', onPointerMove);
     window.addEventListener('pointerup', onPointerUp);
+    window.addEventListener('pointercancel', onPointerUp);
   }
 
   function handleDragEnd(event) {
