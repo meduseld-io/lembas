@@ -1,0 +1,16 @@
+# Cloudflare Pages response headers.
+
+# The service worker and manifest must always be revalidated so app updates reach installed users.
+/sw.js
+  Cache-Control: no-cache
+/manifest.json
+  Cache-Control: no-cache
+  Content-Type: application/manifest+json
+
+# Vite emits content-hashed file names here, so they can be cached forever.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
