@@ -4,6 +4,8 @@
 
 # Lembas
 
+**Live at [lemb.as](https://lemb.as)** - open it on your phone and use Add to Home Screen.
+
 A simple, phone-first PWA for shopping lists and custom to-do lists. Switch between modes with a tap - your data stays separate and persists locally in the browser.
 
 ## Features
@@ -67,6 +69,12 @@ npm run build
 ```
 
 Output goes to `frontend/dist/`.
+
+## Deploy
+
+Hosted on Cloudflare Pages with `lemb.as` as the custom domain. Pages settings: root directory `frontend`, build command `npm run build`, output directory `dist`. Every push to `main` deploys to production. Response headers (no-cache for `sw.js`, long-lived cache for hashed `/assets/*`) live in `frontend/public/_headers`.
+
+When you change files in the precache list in `frontend/public/sw.js`, bump `CACHE_NAME` so installed copies pick up the change.
 
 ## Contributing
 
